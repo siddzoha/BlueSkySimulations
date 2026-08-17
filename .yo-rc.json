@@ -1,0 +1,21 @@
+{
+  "generator-jhipster": {
+    "applicationType": "monolith",
+    "authenticationType": "jwt",
+    "baseName": "blueSky",
+    "buildTool": "maven",
+    "clientFramework": "angular",
+    "creationTimestamp": 1702869675843,
+    "databaseType": "sql",
+    "devDatabaseType": "h2Disk",
+    "enableTranslation": false,
+    "entities": ["Aircraft", "Airport", "FlightLog", "PilotProfile", "Achievement"],
+    "jhipsterVersion": "9.2.0",
+    "jwtSecretKey": "YjE4NGQ3Mjg5ODU5Nzg3OTA3YmExYzZlMmZhYzlmOTcyMzdmOGE1NmVjZmMxNGMwYzNiMTg5YzNmYjQ4NDcyNDY2MzYxYTFiNGI2Yjk4YWFmOTg3Nzg1MmQ3MjliNTY4ZWVjZjFkZTNlMWU2MTJjY2UwYThmNmMyZThiZDkwNTY=",
+    "lastLiquibaseTimestamp": 1702869975000,
+    "nativeLanguage": "en",
+    "packageName": "com.bluesky.simulations",
+    "prodDatabaseType": "mysql",
+    "testFrameworks": ["cypress"]
+  }
+}

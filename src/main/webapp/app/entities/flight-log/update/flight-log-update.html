@@ -1,0 +1,298 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-flight-log-heading" data-cy="FlightLogCreateUpdateHeading">Create or edit a Flight Log</h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let departureTimeRef = editForm.get('departureTime')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_departureTime">Departure Time</label>
+          <div class="d-flex">
+            <input
+              id="field_departureTime"
+              data-cy="departureTime"
+              type="datetime-local"
+              class="form-control"
+              name="departureTime"
+              formControlName="departureTime"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+          @if (departureTimeRef.invalid && (departureTimeRef.dirty || departureTimeRef.touched)) {
+            <div>
+              @if (departureTimeRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!departureTimeRef.errors?.datetimelocal"
+                >This field should be a date and time.</small
+              >
+            </div>
+          }
+        </div>
+
+        @let arrivalTimeRef = editForm.get('arrivalTime')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_arrivalTime">Arrival Time</label>
+          <div class="d-flex">
+            <input
+              id="field_arrivalTime"
+              data-cy="arrivalTime"
+              type="datetime-local"
+              class="form-control"
+              name="arrivalTime"
+              formControlName="arrivalTime"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+          @if (arrivalTimeRef.invalid && (arrivalTimeRef.dirty || arrivalTimeRef.touched)) {
+            <div>
+              @if (arrivalTimeRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!arrivalTimeRef.errors?.datetimelocal"
+                >This field should be a date and time.</small
+              >
+            </div>
+          }
+        </div>
+
+        @let durationHoursRef = editForm.get('durationHours')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_durationHours">Duration Hours</label>
+          <input
+            type="number"
+            class="form-control"
+            name="durationHours"
+            id="field_durationHours"
+            data-cy="durationHours"
+            formControlName="durationHours"
+          />
+          @if (durationHoursRef.invalid && (durationHoursRef.dirty || durationHoursRef.touched)) {
+            <div>
+              @if (durationHoursRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              @if (durationHoursRef.errors?.min) {
+                <small class="form-text text-danger">This field should be at least 0.</small>
+              }
+              @if (durationHoursRef.errors?.max) {
+                <small class="form-text text-danger">This field cannot be more than 30.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!durationHoursRef.errors?.number">This field should be a number.</small>
+            </div>
+          }
+        </div>
+
+        @let distanceNmRef = editForm.get('distanceNm')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_distanceNm">Distance Nm</label>
+          <input
+            type="number"
+            class="form-control"
+            name="distanceNm"
+            id="field_distanceNm"
+            data-cy="distanceNm"
+            formControlName="distanceNm"
+          />
+          @if (distanceNmRef.invalid && (distanceNmRef.dirty || distanceNmRef.touched)) {
+            <div>
+              @if (distanceNmRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              @if (distanceNmRef.errors?.min) {
+                <small class="form-text text-danger">This field should be at least 1.</small>
+              }
+              @if (distanceNmRef.errors?.max) {
+                <small class="form-text text-danger">This field cannot be more than 15000.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!distanceNmRef.errors?.number">This field should be a number.</small>
+            </div>
+          }
+        </div>
+
+        @let cruiseAltitudeFtRef = editForm.get('cruiseAltitudeFt')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_cruiseAltitudeFt">Cruise Altitude Ft</label>
+          <input
+            type="number"
+            class="form-control"
+            name="cruiseAltitudeFt"
+            id="field_cruiseAltitudeFt"
+            data-cy="cruiseAltitudeFt"
+            formControlName="cruiseAltitudeFt"
+          />
+          @if (cruiseAltitudeFtRef.invalid && (cruiseAltitudeFtRef.dirty || cruiseAltitudeFtRef.touched)) {
+            <div>
+              @if (cruiseAltitudeFtRef.errors?.min) {
+                <small class="form-text text-danger">This field should be at least 1000.</small>
+              }
+              @if (cruiseAltitudeFtRef.errors?.max) {
+                <small class="form-text text-danger">This field cannot be more than 60000.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!cruiseAltitudeFtRef.errors?.number">This field should be a number.</small>
+            </div>
+          }
+        </div>
+
+        @let fuelUsedGallonsRef = editForm.get('fuelUsedGallons')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_fuelUsedGallons">Fuel Used Gallons</label>
+          <input
+            type="number"
+            class="form-control"
+            name="fuelUsedGallons"
+            id="field_fuelUsedGallons"
+            data-cy="fuelUsedGallons"
+            formControlName="fuelUsedGallons"
+          />
+          @if (fuelUsedGallonsRef.invalid && (fuelUsedGallonsRef.dirty || fuelUsedGallonsRef.touched)) {
+            <div>
+              @if (fuelUsedGallonsRef.errors?.min) {
+                <small class="form-text text-danger">This field should be at least 0.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!fuelUsedGallonsRef.errors?.number">This field should be a number.</small>
+            </div>
+          }
+        </div>
+
+        @let xpEarnedRef = editForm.get('xpEarned')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_xpEarned">Xp Earned</label>
+          <input type="number" class="form-control" name="xpEarned" id="field_xpEarned" data-cy="xpEarned" formControlName="xpEarned" />
+          @if (xpEarnedRef.invalid && (xpEarnedRef.dirty || xpEarnedRef.touched)) {
+            <div>
+              @if (xpEarnedRef.errors?.min) {
+                <small class="form-text text-danger">This field should be at least 0.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!xpEarnedRef.errors?.number">This field should be a number.</small>
+            </div>
+          }
+        </div>
+
+        @let flightRulesRef = editForm.get('flightRules')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_flightRules">Flight Rules</label>
+          <select class="form-control" name="flightRules" formControlName="flightRules" id="field_flightRules" data-cy="flightRules">
+            <option [ngValue]="null"></option>
+            @for (flightRules of flightRulesValues; track $index) {
+              <option [value]="flightRules">{{ { null: '', VFR: 'VFR', IFR: 'IFR' }[flightRules] }}</option>
+            }
+          </select>
+          @if (flightRulesRef.invalid && (flightRulesRef.dirty || flightRulesRef.touched)) {
+            <div>
+              @if (flightRulesRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let remarksRef = editForm.get('remarks')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_remarks">Remarks</label>
+          <input type="text" class="form-control" name="remarks" id="field_remarks" data-cy="remarks" formControlName="remarks" />
+          @if (remarksRef.invalid && (remarksRef.dirty || remarksRef.touched)) {
+            <div>
+              @if (remarksRef.errors?.maxlength) {
+                <small class="form-text text-danger">This field cannot be longer than 500 characters.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_aircraft">Aircraft</label>
+          <select
+            class="form-control"
+            id="field_aircraft"
+            data-cy="aircraft"
+            name="aircraft"
+            formControlName="aircraft"
+            [compareWith]="compareAircraft"
+          >
+            <option [ngValue]="null"></option>
+            @for (aircraftOption of aircraftsSharedCollection(); track $index) {
+              <option [ngValue]="aircraftOption">{{ aircraftOption.modelName }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_departureAirport">Departure Airport</label>
+          <select
+            class="form-control"
+            id="field_departureAirport"
+            data-cy="departureAirport"
+            name="departureAirport"
+            formControlName="departureAirport"
+            [compareWith]="compareAirport"
+          >
+            <option [ngValue]="null"></option>
+            @for (airportOption of airportsSharedCollection(); track $index) {
+              <option [ngValue]="airportOption">{{ airportOption.name }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_arrivalAirport">Arrival Airport</label>
+          <select
+            class="form-control"
+            id="field_arrivalAirport"
+            data-cy="arrivalAirport"
+            name="arrivalAirport"
+            formControlName="arrivalAirport"
+            [compareWith]="compareAirport"
+          >
+            <option [ngValue]="null"></option>
+            @for (airportOption of airportsSharedCollection(); track $index) {
+              <option [ngValue]="airportOption">{{ airportOption.name }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_pilot">Pilot</label>
+          <select
+            class="form-control"
+            id="field_pilot"
+            data-cy="pilot"
+            name="pilot"
+            formControlName="pilot"
+            [compareWith]="comparePilotProfile"
+          >
+            <option [ngValue]="null"></option>
+            @for (pilotProfileOption of pilotProfilesSharedCollection(); track $index) {
+              <option [ngValue]="pilotProfileOption">{{ pilotProfileOption.id }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban" />&nbsp;<span>Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving()"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save" />&nbsp;<span>Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

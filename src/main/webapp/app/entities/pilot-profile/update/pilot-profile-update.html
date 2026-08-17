@@ -1,0 +1,205 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-pilot-profile-heading" data-cy="PilotProfileCreateUpdateHeading">Create or edit a Pilot Profile</h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let totalXpRef = editForm.get('totalXp')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_totalXp">Total Xp</label>
+          <input type="number" class="form-control" name="totalXp" id="field_totalXp" data-cy="totalXp" formControlName="totalXp" />
+          @if (totalXpRef.invalid && (totalXpRef.dirty || totalXpRef.touched)) {
+            <div>
+              @if (totalXpRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              @if (totalXpRef.errors?.min) {
+                <small class="form-text text-danger">This field should be at least 0.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!totalXpRef.errors?.number">This field should be a number.</small>
+            </div>
+          }
+        </div>
+
+        @let rankTierRef = editForm.get('rankTier')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_rankTier">Rank Tier</label>
+          <select class="form-control" name="rankTier" formControlName="rankTier" id="field_rankTier" data-cy="rankTier">
+            <option [ngValue]="null"></option>
+            @for (rankTier of rankTierValues; track $index) {
+              <option [value]="rankTier">
+                {{
+                  {
+                    null: '',
+                    STUDENT: 'STUDENT',
+                    FIRST_OFFICER: 'FIRST_OFFICER',
+                    SENIOR_FIRST_OFFICER: 'SENIOR_FIRST_OFFICER',
+                    CAPTAIN: 'CAPTAIN',
+                    FLEET_CHIEF: 'FLEET_CHIEF',
+                  }[rankTier]
+                }}
+              </option>
+            }
+          </select>
+          @if (rankTierRef.invalid && (rankTierRef.dirty || rankTierRef.touched)) {
+            <div>
+              @if (rankTierRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let totalFlightHoursRef = editForm.get('totalFlightHours')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_totalFlightHours">Total Flight Hours</label>
+          <input
+            type="number"
+            class="form-control"
+            name="totalFlightHours"
+            id="field_totalFlightHours"
+            data-cy="totalFlightHours"
+            formControlName="totalFlightHours"
+          />
+          @if (totalFlightHoursRef.invalid && (totalFlightHoursRef.dirty || totalFlightHoursRef.touched)) {
+            <div>
+              @if (totalFlightHoursRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              @if (totalFlightHoursRef.errors?.min) {
+                <small class="form-text text-danger">This field should be at least 0.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!totalFlightHoursRef.errors?.number">This field should be a number.</small>
+            </div>
+          }
+        </div>
+
+        @let totalNightFlightHoursRef = editForm.get('totalNightFlightHours')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_totalNightFlightHours">Total Night Flight Hours</label>
+          <input
+            type="number"
+            class="form-control"
+            name="totalNightFlightHours"
+            id="field_totalNightFlightHours"
+            data-cy="totalNightFlightHours"
+            formControlName="totalNightFlightHours"
+          />
+          @if (totalNightFlightHoursRef.invalid && (totalNightFlightHoursRef.dirty || totalNightFlightHoursRef.touched)) {
+            <div>
+              @if (totalNightFlightHoursRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              @if (totalNightFlightHoursRef.errors?.min) {
+                <small class="form-text text-danger">This field should be at least 0.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!totalNightFlightHoursRef.errors?.number"
+                >This field should be a number.</small
+              >
+            </div>
+          }
+        </div>
+
+        @let totalIfrFlightHoursRef = editForm.get('totalIfrFlightHours')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_totalIfrFlightHours">Total Ifr Flight Hours</label>
+          <input
+            type="number"
+            class="form-control"
+            name="totalIfrFlightHours"
+            id="field_totalIfrFlightHours"
+            data-cy="totalIfrFlightHours"
+            formControlName="totalIfrFlightHours"
+          />
+          @if (totalIfrFlightHoursRef.invalid && (totalIfrFlightHoursRef.dirty || totalIfrFlightHoursRef.touched)) {
+            <div>
+              @if (totalIfrFlightHoursRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              @if (totalIfrFlightHoursRef.errors?.min) {
+                <small class="form-text text-danger">This field should be at least 0.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!totalIfrFlightHoursRef.errors?.number">This field should be a number.</small>
+            </div>
+          }
+        </div>
+
+        @let flightsCompletedRef = editForm.get('flightsCompleted')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_flightsCompleted">Flights Completed</label>
+          <input
+            type="number"
+            class="form-control"
+            name="flightsCompleted"
+            id="field_flightsCompleted"
+            data-cy="flightsCompleted"
+            formControlName="flightsCompleted"
+          />
+          @if (flightsCompletedRef.invalid && (flightsCompletedRef.dirty || flightsCompletedRef.touched)) {
+            <div>
+              @if (flightsCompletedRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              @if (flightsCompletedRef.errors?.min) {
+                <small class="form-text text-danger">This field should be at least 0.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!flightsCompletedRef.errors?.number">This field should be a number.</small>
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_user">User</label>
+          <select class="form-control" id="field_user" data-cy="user" name="user" formControlName="user" [compareWith]="compareUser">
+            <option [ngValue]="null"></option>
+            @for (userOption of usersSharedCollection(); track $index) {
+              <option [ngValue]="userOption">{{ userOption.login }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label for="field_achievementses">Achievements</label>
+          <select
+            class="form-control"
+            id="field_achievementses"
+            data-cy="achievements"
+            multiple
+            name="achievementses"
+            formControlName="achievementses"
+            [compareWith]="compareAchievement"
+          >
+            @for (achievementOption of achievementsSharedCollection(); track $index) {
+              <option [ngValue]="achievementOption">{{ achievementOption.title }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban" />&nbsp;<span>Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving()"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save" />&nbsp;<span>Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

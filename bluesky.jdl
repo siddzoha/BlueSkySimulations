@@ -1,0 +1,111 @@
+application {
+    config {
+        baseName blueSky
+        applicationType monolith
+        packageName com.bluesky.simulations
+        authenticationType jwt
+        databaseType sql
+        devDatabaseType h2Disk
+        prodDatabaseType mysql
+        buildTool maven
+        clientFramework angularX
+        enableTranslation false
+        testFrameworks [cypress]
+    }
+    entities *
+}
+
+enum AircraftCategory {
+    PISTON_SINGLE,
+    TURBOPROP,
+    REGIONAL_JET,
+    NARROWBODY_JET,
+    WIDEBODY_JET
+}
+
+enum FlightRules {
+    VFR,
+    IFR
+}
+
+enum RankTier {
+    STUDENT,
+    FIRST_OFFICER,
+    SENIOR_FIRST_OFFICER,
+    CAPTAIN,
+    FLEET_CHIEF
+}
+
+entity Aircraft {
+    tailNumber String required maxlength(10)
+    modelName String required maxlength(50)
+    icaoType String required maxlength(4)
+    category AircraftCategory required
+    cruiseSpeedKnots Integer required min(40) max(600)
+    maxRangeNm Integer required min(100) max(10000)
+    serviceCeilingFt Integer min(1000) max(60000)
+    fuelBurnGph Double required min(1) max(5000)
+    minRunwayLengthFt Integer required min(500) max(15000)
+}
+
+entity Airport {
+    icaoCode String required unique minlength(3) maxlength(4)
+    iataCode String maxlength(3)
+    name String required maxlength(100)
+    city String required maxlength(50)
+    country String required maxlength(50)
+    latitude Double required min(-90) max(90)
+    longitude Double required min(-180) max(180)
+    elevationFt Integer min(-1500) max(15000)
+    longestRunwayFt Integer required min(500) max(20000)
+}
+
+entity FlightLog {
+    departureTime Instant required
+    arrivalTime Instant required
+    durationHours Double required min(0) max(30)
+    distanceNm Integer required min(1) max(15000)
+    cruiseAltitudeFt Integer min(1000) max(60000)
+    fuelUsedGallons Double min(0)
+    xpEarned Integer min(0)
+    flightRules FlightRules required
+    remarks String maxlength(500)
+}
+
+entity PilotProfile {
+    totalXp Integer required min(0)
+    rankTier RankTier required
+    totalFlightHours Double required min(0)
+    totalNightFlightHours Double required min(0)
+    totalIfrFlightHours Double required min(0)
+    flightsCompleted Integer required min(0)
+}
+
+entity Achievement {
+    code String required unique maxlength(50)
+    title String required maxlength(100)
+    description String required maxlength(255)
+    badgeIcon String maxlength(50)
+    xpReward Integer required min(0)
+}
+
+//Relationships
+relationship ManyToOne {
+    FlightLog{aircraft(modelName)} to Aircraft
+    FlightLog{departureAirport(name)} to Airport
+    FlightLog{arrivalAirport(name)} to Airport
+    FlightLog{pilot} to PilotProfile
+}
+
+relationship OneToOne {
+    PilotProfile{user(login)} to User with builtInEntity
+}
+
+relationship ManyToMany {
+    PilotProfile{achievements(title)} to Achievement{pilots}
+}
+
+// Enterprise Options
+dto * with mapstruct
+service * with serviceImpl
+paginate Airport, FlightLog with pagination

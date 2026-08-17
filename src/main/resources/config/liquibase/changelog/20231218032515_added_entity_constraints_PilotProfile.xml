@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    <!--
+        Added the constraints for entity PilotProfile.
+    -->
+    <changeSet id="20231218032515-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="user_id"
+                                 baseTableName="pilot_profile"
+                                 constraintName="fk_pilot_profile__user_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="jhi_user"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="pilot_profile_id"
+                                 baseTableName="rel_pilot_profile__achievements"
+                                 constraintName="fk_rel_pilot_profile__achievements__pilot_profile_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="pilot_profile"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="achievements_id"
+                                 baseTableName="rel_pilot_profile__achievements"
+                                 constraintName="fk_rel_pilot_profile__achievements__achievements_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="achievement"
+                                 />
+    </changeSet>
+</databaseChangeLog>

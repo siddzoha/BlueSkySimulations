@@ -1,0 +1,159 @@
+<div>
+  <h2 id="page-heading" data-cy="AircraftHeading">
+    <span>Aircraft</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span>Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-aircraft"
+        [routerLink]="['/aircraft/new']"
+      >
+        <fa-icon icon="plus" />
+        <span>Create a new Aircraft</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  @if (aircrafts().length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span>No Aircraft found</span>
+    </div>
+  } @else {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span>ID</span>
+
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="tailNumber">
+              <div class="d-flex">
+                <span>Tail Number</span>
+
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="modelName">
+              <div class="d-flex">
+                <span>Model Name</span>
+
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="icaoType">
+              <div class="d-flex">
+                <span>Icao Type</span>
+
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="category">
+              <div class="d-flex">
+                <span>Category</span>
+
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="cruiseSpeedKnots">
+              <div class="d-flex">
+                <span>Cruise Speed Knots</span>
+
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="maxRangeNm">
+              <div class="d-flex">
+                <span>Max Range Nm</span>
+
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="serviceCeilingFt">
+              <div class="d-flex">
+                <span>Service Ceiling Ft</span>
+
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="fuelBurnGph">
+              <div class="d-flex">
+                <span>Fuel Burn Gph</span>
+
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="minRunwayLengthFt">
+              <div class="d-flex">
+                <span>Min Runway Length Ft</span>
+
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (aircraft of aircrafts(); track trackId(aircraft)) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/aircraft', aircraft.id, 'view']">{{ aircraft.id }}</a>
+              </td>
+              <td>{{ aircraft.tailNumber }}</td>
+              <td>{{ aircraft.modelName }}</td>
+              <td>{{ aircraft.icaoType }}</td>
+              <td>
+                {{
+                  {
+                    null: '',
+                    PISTON_SINGLE: 'PISTON_SINGLE',
+                    TURBOPROP: 'TURBOPROP',
+                    REGIONAL_JET: 'REGIONAL_JET',
+                    NARROWBODY_JET: 'NARROWBODY_JET',
+                    WIDEBODY_JET: 'WIDEBODY_JET',
+                  }[aircraft.category ?? 'null']
+                }}
+              </td>
+              <td>{{ aircraft.cruiseSpeedKnots }}</td>
+              <td>{{ aircraft.maxRangeNm }}</td>
+              <td>{{ aircraft.serviceCeilingFt }}</td>
+              <td>{{ aircraft.fuelBurnGph }}</td>
+              <td>{{ aircraft.minRunwayLengthFt }}</td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a [routerLink]="['/aircraft', aircraft.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+                    <fa-icon icon="eye" />
+                    <span class="d-none d-md-inline">View</span>
+                  </a>
+
+                  <a [routerLink]="['/aircraft', aircraft.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                    <fa-icon icon="pencil-alt" />
+                    <span class="d-none d-md-inline">Edit</span>
+                  </a>
+
+                  <button type="submit" (click)="delete(aircraft)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times" />
+                    <span class="d-none d-md-inline">Delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

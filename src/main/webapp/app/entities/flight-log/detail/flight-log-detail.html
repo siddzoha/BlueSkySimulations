@@ -1,0 +1,98 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (flightLog(); as flightLogRef) {
+      <div>
+        <h2 data-cy="flightLogDetailsHeading"><span>Flight Log</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span>ID</span></dt>
+          <dd>
+            <span>{{ flightLogRef.id }}</span>
+          </dd>
+          <dt><span>Departure Time</span></dt>
+          <dd>
+            <span>{{ flightLogRef.departureTime | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span>Arrival Time</span></dt>
+          <dd>
+            <span>{{ flightLogRef.arrivalTime | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span>Duration Hours</span></dt>
+          <dd>
+            <span>{{ flightLogRef.durationHours }}</span>
+          </dd>
+          <dt><span>Distance Nm</span></dt>
+          <dd>
+            <span>{{ flightLogRef.distanceNm }}</span>
+          </dd>
+          <dt><span>Cruise Altitude Ft</span></dt>
+          <dd>
+            <span>{{ flightLogRef.cruiseAltitudeFt }}</span>
+          </dd>
+          <dt><span>Fuel Used Gallons</span></dt>
+          <dd>
+            <span>{{ flightLogRef.fuelUsedGallons }}</span>
+          </dd>
+          <dt><span>Xp Earned</span></dt>
+          <dd>
+            <span>{{ flightLogRef.xpEarned }}</span>
+          </dd>
+          <dt><span>Flight Rules</span></dt>
+          <dd>
+            <span>{{ { null: '', VFR: 'VFR', IFR: 'IFR' }[flightLogRef.flightRules ?? 'null'] }}</span>
+          </dd>
+          <dt><span>Remarks</span></dt>
+          <dd>
+            <span>{{ flightLogRef.remarks }}</span>
+          </dd>
+          <dt><span>Aircraft</span></dt>
+          <dd>
+            @if (flightLog()!.aircraft) {
+              <div>
+                <a [routerLink]="['/aircraft', flightLog()!.aircraft?.id, 'view']">{{ flightLogRef.aircraft?.modelName }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span>Departure Airport</span></dt>
+          <dd>
+            @if (flightLog()!.departureAirport) {
+              <div>
+                <a [routerLink]="['/airport', flightLog()!.departureAirport?.id, 'view']">{{ flightLogRef.departureAirport?.name }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span>Arrival Airport</span></dt>
+          <dd>
+            @if (flightLog()!.arrivalAirport) {
+              <div>
+                <a [routerLink]="['/airport', flightLog()!.arrivalAirport?.id, 'view']">{{ flightLogRef.arrivalAirport?.name }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span>Pilot</span></dt>
+          <dd>
+            @if (flightLog()!.pilot) {
+              <div>
+                <a [routerLink]="['/pilot-profile', flightLog()!.pilot?.id, 'view']">{{ flightLogRef.pilot?.id }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span>Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/flight-log', flightLogRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span>Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

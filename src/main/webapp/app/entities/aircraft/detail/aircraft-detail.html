@@ -1,0 +1,75 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (aircraft(); as aircraftRef) {
+      <div>
+        <h2 data-cy="aircraftDetailsHeading"><span>Aircraft</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span>ID</span></dt>
+          <dd>
+            <span>{{ aircraftRef.id }}</span>
+          </dd>
+          <dt><span>Tail Number</span></dt>
+          <dd>
+            <span>{{ aircraftRef.tailNumber }}</span>
+          </dd>
+          <dt><span>Model Name</span></dt>
+          <dd>
+            <span>{{ aircraftRef.modelName }}</span>
+          </dd>
+          <dt><span>Icao Type</span></dt>
+          <dd>
+            <span>{{ aircraftRef.icaoType }}</span>
+          </dd>
+          <dt><span>Category</span></dt>
+          <dd>
+            <span>{{
+              {
+                null: '',
+                PISTON_SINGLE: 'PISTON_SINGLE',
+                TURBOPROP: 'TURBOPROP',
+                REGIONAL_JET: 'REGIONAL_JET',
+                NARROWBODY_JET: 'NARROWBODY_JET',
+                WIDEBODY_JET: 'WIDEBODY_JET',
+              }[aircraftRef.category ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span>Cruise Speed Knots</span></dt>
+          <dd>
+            <span>{{ aircraftRef.cruiseSpeedKnots }}</span>
+          </dd>
+          <dt><span>Max Range Nm</span></dt>
+          <dd>
+            <span>{{ aircraftRef.maxRangeNm }}</span>
+          </dd>
+          <dt><span>Service Ceiling Ft</span></dt>
+          <dd>
+            <span>{{ aircraftRef.serviceCeilingFt }}</span>
+          </dd>
+          <dt><span>Fuel Burn Gph</span></dt>
+          <dd>
+            <span>{{ aircraftRef.fuelBurnGph }}</span>
+          </dd>
+          <dt><span>Min Runway Length Ft</span></dt>
+          <dd>
+            <span>{{ aircraftRef.minRunwayLengthFt }}</span>
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span>Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/aircraft', aircraftRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span>Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,66 @@
+{
+  "annotations": {
+    "changelogDate": "20231218032515"
+  },
+  "applications": ["blueSky"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "totalXp",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required", "min"],
+      "fieldValidateRulesMin": "0"
+    },
+    {
+      "fieldName": "rankTier",
+      "fieldType": "RankTier",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "STUDENT,FIRST_OFFICER,SENIOR_FIRST_OFFICER,CAPTAIN,FLEET_CHIEF"
+    },
+    {
+      "fieldName": "totalFlightHours",
+      "fieldType": "Double",
+      "fieldValidateRules": ["required", "min"],
+      "fieldValidateRulesMin": "0"
+    },
+    {
+      "fieldName": "totalNightFlightHours",
+      "fieldType": "Double",
+      "fieldValidateRules": ["required", "min"],
+      "fieldValidateRulesMin": "0"
+    },
+    {
+      "fieldName": "totalIfrFlightHours",
+      "fieldType": "Double",
+      "fieldValidateRules": ["required", "min"],
+      "fieldValidateRulesMin": "0"
+    },
+    {
+      "fieldName": "flightsCompleted",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required", "min"],
+      "fieldValidateRulesMin": "0"
+    }
+  ],
+  "name": "PilotProfile",
+  "relationships": [
+    {
+      "otherEntityField": "login",
+      "otherEntityName": "user",
+      "relationshipName": "user",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-one",
+      "relationshipWithBuiltInEntity": true
+    },
+    {
+      "otherEntityField": "title",
+      "otherEntityName": "achievement",
+      "otherEntityRelationshipName": "pilots",
+      "relationshipName": "achievements",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-many"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

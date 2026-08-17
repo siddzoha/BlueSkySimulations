@@ -1,0 +1,205 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-airport-heading" data-cy="AirportCreateUpdateHeading">Create or edit a Airport</h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let icaoCodeRef = editForm.get('icaoCode')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_icaoCode">Icao Code</label>
+          <input type="text" class="form-control" name="icaoCode" id="field_icaoCode" data-cy="icaoCode" formControlName="icaoCode" />
+          @if (icaoCodeRef.invalid && (icaoCodeRef.dirty || icaoCodeRef.touched)) {
+            <div>
+              @if (icaoCodeRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              @if (icaoCodeRef.errors?.minlength) {
+                <small class="form-text text-danger">This field is required to be at least 3 characters.</small>
+              }
+              @if (icaoCodeRef.errors?.maxlength) {
+                <small class="form-text text-danger">This field cannot be longer than 4 characters.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let iataCodeRef = editForm.get('iataCode')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_iataCode">Iata Code</label>
+          <input type="text" class="form-control" name="iataCode" id="field_iataCode" data-cy="iataCode" formControlName="iataCode" />
+          @if (iataCodeRef.invalid && (iataCodeRef.dirty || iataCodeRef.touched)) {
+            <div>
+              @if (iataCodeRef.errors?.maxlength) {
+                <small class="form-text text-danger">This field cannot be longer than 3 characters.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let nameRef = editForm.get('name')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_name">Name</label>
+          <input type="text" class="form-control" name="name" id="field_name" data-cy="name" formControlName="name" />
+          @if (nameRef.invalid && (nameRef.dirty || nameRef.touched)) {
+            <div>
+              @if (nameRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              @if (nameRef.errors?.maxlength) {
+                <small class="form-text text-danger">This field cannot be longer than 100 characters.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let cityRef = editForm.get('city')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_city">City</label>
+          <input type="text" class="form-control" name="city" id="field_city" data-cy="city" formControlName="city" />
+          @if (cityRef.invalid && (cityRef.dirty || cityRef.touched)) {
+            <div>
+              @if (cityRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              @if (cityRef.errors?.maxlength) {
+                <small class="form-text text-danger">This field cannot be longer than 50 characters.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let countryRef = editForm.get('country')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_country">Country</label>
+          <input type="text" class="form-control" name="country" id="field_country" data-cy="country" formControlName="country" />
+          @if (countryRef.invalid && (countryRef.dirty || countryRef.touched)) {
+            <div>
+              @if (countryRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              @if (countryRef.errors?.maxlength) {
+                <small class="form-text text-danger">This field cannot be longer than 50 characters.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let latitudeRef = editForm.get('latitude')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_latitude">Latitude</label>
+          <input type="number" class="form-control" name="latitude" id="field_latitude" data-cy="latitude" formControlName="latitude" />
+          @if (latitudeRef.invalid && (latitudeRef.dirty || latitudeRef.touched)) {
+            <div>
+              @if (latitudeRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              @if (latitudeRef.errors?.min) {
+                <small class="form-text text-danger">This field should be at least -90.</small>
+              }
+              @if (latitudeRef.errors?.max) {
+                <small class="form-text text-danger">This field cannot be more than 90.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!latitudeRef.errors?.number">This field should be a number.</small>
+            </div>
+          }
+        </div>
+
+        @let longitudeRef = editForm.get('longitude')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_longitude">Longitude</label>
+          <input type="number" class="form-control" name="longitude" id="field_longitude" data-cy="longitude" formControlName="longitude" />
+          @if (longitudeRef.invalid && (longitudeRef.dirty || longitudeRef.touched)) {
+            <div>
+              @if (longitudeRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              @if (longitudeRef.errors?.min) {
+                <small class="form-text text-danger">This field should be at least -180.</small>
+              }
+              @if (longitudeRef.errors?.max) {
+                <small class="form-text text-danger">This field cannot be more than 180.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!longitudeRef.errors?.number">This field should be a number.</small>
+            </div>
+          }
+        </div>
+
+        @let elevationFtRef = editForm.get('elevationFt')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_elevationFt">Elevation Ft</label>
+          <input
+            type="number"
+            class="form-control"
+            name="elevationFt"
+            id="field_elevationFt"
+            data-cy="elevationFt"
+            formControlName="elevationFt"
+          />
+          @if (elevationFtRef.invalid && (elevationFtRef.dirty || elevationFtRef.touched)) {
+            <div>
+              @if (elevationFtRef.errors?.min) {
+                <small class="form-text text-danger">This field should be at least -1500.</small>
+              }
+              @if (elevationFtRef.errors?.max) {
+                <small class="form-text text-danger">This field cannot be more than 15000.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!elevationFtRef.errors?.number">This field should be a number.</small>
+            </div>
+          }
+        </div>
+
+        @let longestRunwayFtRef = editForm.get('longestRunwayFt')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_longestRunwayFt">Longest Runway Ft</label>
+          <input
+            type="number"
+            class="form-control"
+            name="longestRunwayFt"
+            id="field_longestRunwayFt"
+            data-cy="longestRunwayFt"
+            formControlName="longestRunwayFt"
+          />
+          @if (longestRunwayFtRef.invalid && (longestRunwayFtRef.dirty || longestRunwayFtRef.touched)) {
+            <div>
+              @if (longestRunwayFtRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              @if (longestRunwayFtRef.errors?.min) {
+                <small class="form-text text-danger">This field should be at least 500.</small>
+              }
+              @if (longestRunwayFtRef.errors?.max) {
+                <small class="form-text text-danger">This field cannot be more than 20000.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!longestRunwayFtRef.errors?.number">This field should be a number.</small>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban" />&nbsp;<span>Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving()"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save" />&nbsp;<span>Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

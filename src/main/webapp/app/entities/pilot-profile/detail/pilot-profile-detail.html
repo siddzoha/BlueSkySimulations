@@ -1,0 +1,76 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (pilotProfile(); as pilotProfileRef) {
+      <div>
+        <h2 data-cy="pilotProfileDetailsHeading"><span>Pilot Profile</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span>ID</span></dt>
+          <dd>
+            <span>{{ pilotProfileRef.id }}</span>
+          </dd>
+          <dt><span>Total Xp</span></dt>
+          <dd>
+            <span>{{ pilotProfileRef.totalXp }}</span>
+          </dd>
+          <dt><span>Rank Tier</span></dt>
+          <dd>
+            <span>{{
+              {
+                null: '',
+                STUDENT: 'STUDENT',
+                FIRST_OFFICER: 'FIRST_OFFICER',
+                SENIOR_FIRST_OFFICER: 'SENIOR_FIRST_OFFICER',
+                CAPTAIN: 'CAPTAIN',
+                FLEET_CHIEF: 'FLEET_CHIEF',
+              }[pilotProfileRef.rankTier ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span>Total Flight Hours</span></dt>
+          <dd>
+            <span>{{ pilotProfileRef.totalFlightHours }}</span>
+          </dd>
+          <dt><span>Total Night Flight Hours</span></dt>
+          <dd>
+            <span>{{ pilotProfileRef.totalNightFlightHours }}</span>
+          </dd>
+          <dt><span>Total Ifr Flight Hours</span></dt>
+          <dd>
+            <span>{{ pilotProfileRef.totalIfrFlightHours }}</span>
+          </dd>
+          <dt><span>Flights Completed</span></dt>
+          <dd>
+            <span>{{ pilotProfileRef.flightsCompleted }}</span>
+          </dd>
+          <dt><span>User</span></dt>
+          <dd>
+            <span>{{ pilotProfileRef.user?.login }}</span>
+          </dd>
+          <dt><span>Achievements</span></dt>
+          <dd>
+            @for (achievements of pilotProfileRef.achievementses; track $index; let last = $last) {
+              <span>
+                <a [routerLink]="['/achievement', achievements.id, 'view']">{{ achievements?.title }}</a
+                >{{ last ? '' : ', ' }}
+              </span>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span>Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/pilot-profile', pilotProfileRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span>Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

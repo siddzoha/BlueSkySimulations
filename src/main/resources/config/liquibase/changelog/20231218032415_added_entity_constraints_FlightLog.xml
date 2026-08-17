@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    <!--
+        Added the constraints for entity FlightLog.
+    -->
+    <changeSet id="20231218032415-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="aircraft_id"
+                                 baseTableName="flight_log"
+                                 constraintName="fk_flight_log__aircraft_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="aircraft"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="departure_airport_id"
+                                 baseTableName="flight_log"
+                                 constraintName="fk_flight_log__departure_airport_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="airport"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="arrival_airport_id"
+                                 baseTableName="flight_log"
+                                 constraintName="fk_flight_log__arrival_airport_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="airport"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="pilot_id"
+                                 baseTableName="flight_log"
+                                 constraintName="fk_flight_log__pilot_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="pilot_profile"
+                                 />
+    </changeSet>
+</databaseChangeLog>

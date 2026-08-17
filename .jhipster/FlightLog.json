@@ -1,0 +1,97 @@
+{
+  "annotations": {
+    "changelogDate": "20231218032415"
+  },
+  "applications": ["blueSky"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "departureTime",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "arrivalTime",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "durationHours",
+      "fieldType": "Double",
+      "fieldValidateRules": ["required", "min", "max"],
+      "fieldValidateRulesMax": "30",
+      "fieldValidateRulesMin": "0"
+    },
+    {
+      "fieldName": "distanceNm",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required", "min", "max"],
+      "fieldValidateRulesMax": "15000",
+      "fieldValidateRulesMin": "1"
+    },
+    {
+      "fieldName": "cruiseAltitudeFt",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["min", "max"],
+      "fieldValidateRulesMax": "60000",
+      "fieldValidateRulesMin": "1000"
+    },
+    {
+      "fieldName": "fuelUsedGallons",
+      "fieldType": "Double",
+      "fieldValidateRules": ["min"],
+      "fieldValidateRulesMin": "0"
+    },
+    {
+      "fieldName": "xpEarned",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["min"],
+      "fieldValidateRulesMin": "0"
+    },
+    {
+      "fieldName": "flightRules",
+      "fieldType": "FlightRules",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "VFR,IFR"
+    },
+    {
+      "fieldName": "remarks",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "500"
+    }
+  ],
+  "name": "FlightLog",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityField": "modelName",
+      "otherEntityName": "aircraft",
+      "relationshipName": "aircraft",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityField": "name",
+      "otherEntityName": "airport",
+      "relationshipName": "departureAirport",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityField": "name",
+      "otherEntityName": "airport",
+      "relationshipName": "arrivalAirport",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "pilotProfile",
+      "relationshipName": "pilot",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

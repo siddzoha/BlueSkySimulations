@@ -1,0 +1,72 @@
+{
+  "annotations": {
+    "changelogDate": "20231218032215"
+  },
+  "applications": ["blueSky"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "tailNumber",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "maxlength"],
+      "fieldValidateRulesMaxlength": "10"
+    },
+    {
+      "fieldName": "modelName",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "maxlength"],
+      "fieldValidateRulesMaxlength": "50"
+    },
+    {
+      "fieldName": "icaoType",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "maxlength"],
+      "fieldValidateRulesMaxlength": "4"
+    },
+    {
+      "fieldName": "category",
+      "fieldType": "AircraftCategory",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "PISTON_SINGLE,TURBOPROP,REGIONAL_JET,NARROWBODY_JET,WIDEBODY_JET"
+    },
+    {
+      "fieldName": "cruiseSpeedKnots",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required", "min", "max"],
+      "fieldValidateRulesMax": "600",
+      "fieldValidateRulesMin": "40"
+    },
+    {
+      "fieldName": "maxRangeNm",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required", "min", "max"],
+      "fieldValidateRulesMax": "10000",
+      "fieldValidateRulesMin": "100"
+    },
+    {
+      "fieldName": "serviceCeilingFt",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["min", "max"],
+      "fieldValidateRulesMax": "60000",
+      "fieldValidateRulesMin": "1000"
+    },
+    {
+      "fieldName": "fuelBurnGph",
+      "fieldType": "Double",
+      "fieldValidateRules": ["required", "min", "max"],
+      "fieldValidateRulesMax": "5000",
+      "fieldValidateRulesMin": "1"
+    },
+    {
+      "fieldName": "minRunwayLengthFt",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required", "min", "max"],
+      "fieldValidateRulesMax": "15000",
+      "fieldValidateRulesMin": "500"
+    }
+  ],
+  "name": "Aircraft",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

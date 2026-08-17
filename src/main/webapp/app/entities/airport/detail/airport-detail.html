@@ -1,0 +1,66 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (airport(); as airportRef) {
+      <div>
+        <h2 data-cy="airportDetailsHeading"><span>Airport</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span>ID</span></dt>
+          <dd>
+            <span>{{ airportRef.id }}</span>
+          </dd>
+          <dt><span>Icao Code</span></dt>
+          <dd>
+            <span>{{ airportRef.icaoCode }}</span>
+          </dd>
+          <dt><span>Iata Code</span></dt>
+          <dd>
+            <span>{{ airportRef.iataCode }}</span>
+          </dd>
+          <dt><span>Name</span></dt>
+          <dd>
+            <span>{{ airportRef.name }}</span>
+          </dd>
+          <dt><span>City</span></dt>
+          <dd>
+            <span>{{ airportRef.city }}</span>
+          </dd>
+          <dt><span>Country</span></dt>
+          <dd>
+            <span>{{ airportRef.country }}</span>
+          </dd>
+          <dt><span>Latitude</span></dt>
+          <dd>
+            <span>{{ airportRef.latitude }}</span>
+          </dd>
+          <dt><span>Longitude</span></dt>
+          <dd>
+            <span>{{ airportRef.longitude }}</span>
+          </dd>
+          <dt><span>Elevation Ft</span></dt>
+          <dd>
+            <span>{{ airportRef.elevationFt }}</span>
+          </dd>
+          <dt><span>Longest Runway Ft</span></dt>
+          <dd>
+            <span>{{ airportRef.longestRunwayFt }}</span>
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span>Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/airport', airportRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span>Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

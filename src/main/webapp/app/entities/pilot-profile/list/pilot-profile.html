@@ -1,0 +1,158 @@
+<div>
+  <h2 id="page-heading" data-cy="PilotProfileHeading">
+    <span>Pilot Profiles</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span>Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-pilot-profile"
+        [routerLink]="['/pilot-profile/new']"
+      >
+        <fa-icon icon="plus" />
+        <span>Create a new Pilot Profile</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  @if (pilotProfiles().length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span>No Pilot Profiles found</span>
+    </div>
+  } @else {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span>ID</span>
+
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="totalXp">
+              <div class="d-flex">
+                <span>Total Xp</span>
+
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="rankTier">
+              <div class="d-flex">
+                <span>Rank Tier</span>
+
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="totalFlightHours">
+              <div class="d-flex">
+                <span>Total Flight Hours</span>
+
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="totalNightFlightHours">
+              <div class="d-flex">
+                <span>Total Night Flight Hours</span>
+
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="totalIfrFlightHours">
+              <div class="d-flex">
+                <span>Total Ifr Flight Hours</span>
+
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="flightsCompleted">
+              <div class="d-flex">
+                <span>Flights Completed</span>
+
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="user.login">
+              <div class="d-flex">
+                <span>User</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="achievements.title">
+              <div class="d-flex">
+                <span>Achievements</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (pilotProfile of pilotProfiles(); track trackId(pilotProfile)) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/pilot-profile', pilotProfile.id, 'view']">{{ pilotProfile.id }}</a>
+              </td>
+              <td>{{ pilotProfile.totalXp }}</td>
+              <td>
+                {{
+                  {
+                    null: '',
+                    STUDENT: 'STUDENT',
+                    FIRST_OFFICER: 'FIRST_OFFICER',
+                    SENIOR_FIRST_OFFICER: 'SENIOR_FIRST_OFFICER',
+                    CAPTAIN: 'CAPTAIN',
+                    FLEET_CHIEF: 'FLEET_CHIEF',
+                  }[pilotProfile.rankTier ?? 'null']
+                }}
+              </td>
+              <td>{{ pilotProfile.totalFlightHours }}</td>
+              <td>{{ pilotProfile.totalNightFlightHours }}</td>
+              <td>{{ pilotProfile.totalIfrFlightHours }}</td>
+              <td>{{ pilotProfile.flightsCompleted }}</td>
+              <td>
+                {{ pilotProfile.user?.login }}
+              </td>
+              <td>
+                @for (achievements of pilotProfile.achievementses; track $index; let last = $last) {
+                  <span>
+                    <a class="form-control-static" [routerLink]="['/achievement', achievements.id, 'view']">{{ achievements.title }}</a
+                    >{{ last ? '' : ', ' }}
+                  </span>
+                }
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a [routerLink]="['/pilot-profile', pilotProfile.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+                    <fa-icon icon="eye" />
+                    <span class="d-none d-md-inline">View</span>
+                  </a>
+
+                  <a [routerLink]="['/pilot-profile', pilotProfile.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                    <fa-icon icon="pencil-alt" />
+                    <span class="d-none d-md-inline">Edit</span>
+                  </a>
+
+                  <button type="submit" (click)="delete(pilotProfile)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times" />
+                    <span class="d-none d-md-inline">Delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
