@@ -1,31 +1,33 @@
 id;icao_code;iata_code;name;city;country;latitude;longitude;elevation_ft;longest_runway_ft
-1;clim;mai;abaft fragrant;Durham;Tonga;-21.55;-32.34;9356;4840
-2;only;ins;pick mmm monthly;O'Haraview;Monaco;9.21;-85.73;11052;912
-3;avar;ded;bashfully highly;West Manley;Democratic Republic of the Congo;-10.71;118.65;11359;11985
-4;conc;und;inside hmph right;Carolinefield;Libyan Arab Jamahiriya;45.67;-157.71;14060;11834
-5;phon;hen;igloo sympathetically;Hemet;Yemen;30.78;78.83;-691;16645
-6;zowi;daz;ugh volunteer;East Johannahaven;Sweden;-63.16;177.91;13484;11080
-7;acro;com;wretched;East Greg;Lao People's Democratic Republic;-80.24;66.25;8038;11207
-8;woot;vio;than now;Tyresefield;Palau;33.65;-28.5;3646;6131
-9;outr;alt;astride;Kilbackstad;Azerbaijan;72.37;111.51;10982;16286
-10;indo;dep;flat;Fort Michale;Sudan;-25.18;62.12;8706;5874
-11;smar;off;haul including yippee;Fort Augusta;Colombia;59.33;-76.09;-120;9217
-12;warl;per;parallel;Brookhaven;Mali;-71.69;-101.38;830;5246
-13;but;con;best-seller aw authentic;Orland Park;Ecuador;-71.61;-63.11;9743;1346
-14;hone;bar;whoa;East Patville;Tajikistan;-54.72;54.06;10298;801
-15;whet;den;wrathful ha;Caguas;Lebanon;-40.68;-113.72;13947;2527
-16;grou;fes;effector;Rebeccaland;Tunisia;46.16;151.21;9831;2926
-17;veto;aft;deck pace;Encinitas;Malaysia;11.57;-127.09;9599;19813
-18;mid ;pas;oxidize;East Lennastad;Fiji;-25.51;-177.96;14429;8666
-19;pron;meh;importance snoop;Lake Johnpaul;Barbados;-49.97;142.77;5385;12211
-20;repo;fro;heavy although meanwhile;Auerstead;United States of America;28.89;-148.62;10341;16888
-21;lest;rea;unearth;South Constance;Iceland;17.7;-143.14;11275;5120
-22;agai;bey;hmph aha;Wizaside;Denmark;32.7;-145.97;11839;6899
-23;oppo;con;shrilly other;Columbia;Botswana;58.3;155.04;10323;13740
-24;brr ;cor;oh irk perfection;Norwalk;New Zealand;83.01;-55.36;726;18331
-25;thro;eno;certainly french snuggle;South Whittier;Faroe Islands;-71.79;-23.96;14866;10412
-26;ewX;coi;shameful;Deborahberg;Dominica;71.81;-90.16;58;6590
-27;yiel;who;boldly so cautiously;West Lazaroburgh;Martinique;68.37;65.93;1744;8289
-28;yum;dre;incidentally;Edmundhaven;Luxembourg;78.47;-35.89;299;6978
-29;pish;ver;scarily ew yowza;Gabrielworth;South Sudan;-49.98;-41.75;11463;14957
-30;wild;in-;produce;Lake Roy;Taiwan;40.61;-123.85;14413;5776
+1;CYYZ;YYZ;Toronto Pearson International;Toronto;Canada;43.6777;-79.6248;569;11120
+2;CYTZ;YTZ;Billy Bishop Toronto City;Toronto;Canada;43.6275;-79.3962;251;3988
+3;CYOW;YOW;Ottawa Macdonald-Cartier Intl;Ottawa;Canada;45.3225;-75.6692;374;10005
+4;CYUL;YUL;Montreal-Pierre Elliott Trudeau;Montreal;Canada;45.4706;-73.7408;118;11000
+5;CYQB;YQB;Quebec City Jean Lesage Intl;Quebec City;Canada;46.7911;-71.3933;244;9000
+6;CYVR;YVR;Vancouver International;Vancouver;Canada;49.1947;-123.1844;14;11500
+7;CYXX;YXX;Abbotsford International;Abbotsford;Canada;49.0253;-122.3608;195;9600
+8;CYVG;YVG;Victoria International;Victoria;Canada;48.6469;-123.4258;63;7000
+9;CYYC;YYC;Calgary International;Calgary;Canada;51.1139;-114.0203;3557;14000
+10;CYEG;YEG;Edmonton International;Edmonton;Canada;53.3097;-113.5797;2373;11000
+11;CYWG;YWG;Winnipeg Richardson Intl;Winnipeg;Canada;49.9100;-97.2399;783;11000
+12;CYHZ;YHZ;Halifax Stanfield International;Halifax;Canada;44.8808;-63.5086;477;10500
+13;CYYT;YYT;St. John's International;St. John's;Canada;47.6186;-52.7519;461;8502
+14;CYQM;YQM;Greater Moncton Romeo LeBlanc;Moncton;Canada;46.1122;-64.6786;232;10000
+15;KJFK;JFK;John F. Kennedy International;New York;United States;40.6398;-73.7789;13;14511
+16;KLGA;LGA;LaGuardia Airport;New York;United States;40.7769;-73.8740;21;7001
+17;KBOS;BOS;Boston Logan International;Boston;United States;42.3656;-71.0096;19;10083
+18;KORD;ORD;Chicago O'Hare International;Chicago;United States;41.9742;-87.9073;668;13000
+19;KMDW;MDW;Chicago Midway International;Chicago;United States;41.7868;-87.7522;620;6522
+20;KLAX;LAX;Los Angeles International;Los Angeles;United States;33.9425;-118.4081;128;12920
+21;KSFO;SFO;San Francisco International;San Francisco;United States;37.6189;-122.3750;13;11870
+22;KSEA;SEA;Seattle-Tacoma International;Seattle;United States;47.4502;-122.3088;433;11901
+23;KDEN;DEN;Denver International;Denver;United States;39.8561;-104.6737;5434;16000
+24;KDFW;DFW;Dallas/Fort Worth International;Dallas;United States;32.8998;-97.0403;607;13401
+25;KMIA;MIA;Miami International;Miami;United States;25.7959;-80.2870;8;13016
+26;KMCO;MCO;Orlando International;Orlando;United States;28.4294;-81.3089;96;12005
+27;KATL;ATL;Hartsfield-Jackson Atlanta;Atlanta;United States;33.6407;-84.4277;1026;12390
+28;EGLL;LHR;London Heathrow;London;United Kingdom;51.4700;-0.4543;83;12799
+29;LFPG;CDG;Paris Charles de Gaulle;Paris;France;49.0097;2.5478;392;13829
+30;EHAM;AMS;Amsterdam Schiphol;Amsterdam;Netherlands;52.3105;4.7683;-11;12467
+31;TJSJ;SJU;Luis Munoz Marin International;San Juan;Puerto Rico;18.4394;-66.0018;9;10400
+32;MYNN;NAS;Lynden Pindling International;Nassau;Bahamas;25.0390;-77.4662;16;11000
