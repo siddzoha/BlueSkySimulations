@@ -28,6 +28,12 @@ const routes: Routes = [
     path: 'account',
     loadChildren: () => import('./account/account.route'),
   },
+
+  {
+    path: 'flight-dispatcher',
+    loadComponent: () => import('./features/flight-dispatcher/flight-dispatcher').then(m => m.FlightDispatcher),
+    title: 'Flight Dispatcher',
+  },
   {
     path: 'login',
     loadComponent: () => import('./login/login'),

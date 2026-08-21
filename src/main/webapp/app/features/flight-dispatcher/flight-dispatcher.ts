@@ -5,10 +5,12 @@ import { FlightDispatch } from '../../core/services/flight-dispatch';
 import { IAirport } from '../../entities/airport/airport.model';
 import { IAircraft } from '../../entities/aircraft/aircraft.model';
 import { RoutePlan } from '../../core/models/route-plan';
+import { NgForOf, NgIf } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'jhi-flight-dispatcher',
-  imports: [],
+  imports: [NgIf, FormsModule, NgForOf],
   templateUrl: './flight-dispatcher.html',
   styleUrl: './flight-dispatcher.scss',
 })

@@ -1,1 +1,48 @@
-<p>flight-dispatcher works!</p>
+<div class="container mt-4">
+  <h2>Flight Dispatch | Route Planner</h2>
+  <select class="form-select" [(ngModel)]="selectedAircraftId">
+    <option [ngValue]="null" disabled selected>-- Select Aircraft --</option>
+    <option *ngFor="let plane of aircraftList" [ngValue]="plane.id">{{ plane.modelName }} ({{ plane.icaoType }})</option>
+  </select>
+
+  <label class="form-label mt-2">Departure Airport</label>
+  <select class="form-select" [(ngModel)]="selectedDepartureAirportId">
+    <option [ngValue]="null" disabled selected>-- Select Departure Airport --</option>
+    <option *ngFor="let airport of airports" [ngValue]="airport.id">{{ airport.name }} ({{ airport.icaoType }})</option>
+  </select>
+
+  <!-- Arrival Airport -->
+  <label class="form-label mt-2">Arrival Airport</label>
+  <select class="form-select" [(ngModel)]="selectedArrivalAirportId">
+    <option [ngValue]="null" disabled selected>-- Select Arrival Airport --</option>
+    <option *ngFor="let airport of airports" [ngValue]="airport.id">{{ airport.name }} ({{ airport.icaoType }})</option>
+  </select>
+
+  <button class="btn btn-primary" (click)="onCalculateRoute()" [disabled]="isLoading">
+    <span *ngIf="isLoading">Calculating...</span>
+    <span *ngIf="!isLoading">Calculate Flight Plan</span>
+  </button>
+
+  <div *ngIf="errorMessage" class="alert alert-danger mt-3">
+    {{ errorMessage }}
+  </div>
+
+  <div *ngIf="routePlan" class="card mt-4 p-3 bg-dark text-white">
+    <h3>Flight Briefing</h3>
+    <p>
+      Distance: <strong>{{ routePlan.distanceNm }} NM</strong>
+    </p>
+    <p>
+      Initial Heading: <strong>{{ routePlan.initHeading }}°</strong>
+    </p>
+    <p>
+      Estimated Time: <strong>{{ routePlan.estFlightTimeHours }} Hours</strong>
+    </p>
+    <p>
+      Fuel Required: <strong>{{ routePlan.estFuelGallons }} Gallons</strong>
+    </p>
+    <p>
+      XP Reward: <span class="badge bg-success">+{{ routePlan.xpReward }} XP</span>
+    </p>
+  </div>
+</div>
