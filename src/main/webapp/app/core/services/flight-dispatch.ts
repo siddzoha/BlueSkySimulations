@@ -1,6 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { RoutePlan } from '../models/route-plan';
 

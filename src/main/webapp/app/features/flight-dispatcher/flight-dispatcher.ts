@@ -1,12 +1,14 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit, AfterViewInit } from '@angular/core';
+import { NgForOf, NgIf } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import * as L from 'leaflet';
+
 import { AircraftService } from '../../entities/aircraft/service/aircraft.service';
 import { AirportService } from '../../entities/airport/service/airport.service';
 import { FlightDispatch } from '../../core/services/flight-dispatch';
 import { IAirport } from '../../entities/airport/airport.model';
 import { IAircraft } from '../../entities/aircraft/aircraft.model';
 import { RoutePlan } from '../../core/models/route-plan';
-import { NgForOf, NgIf } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'jhi-flight-dispatcher',
@@ -14,7 +16,7 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './flight-dispatcher.html',
   styleUrl: './flight-dispatcher.scss',
 })
-export class FlightDispatcher {
+export class FlightDispatcher implements OnInit, AfterViewInit {
   private aircraftService = inject(AircraftService);
   private airportService = inject(AirportService);
   private flightDispatchService = inject(FlightDispatch);
@@ -28,7 +30,10 @@ export class FlightDispatcher {
   isLoading = false;
   errorMessage: string | null = null;
 
-  ngOnInit() {
+  private map: L.Map | null = null;
+  private routeLayerGroup: L.LayerGroup | null = null;
+
+  ngOnInit(): void {
     this.airportService.query({ size: 100 }).subscribe({
       next: res => {
         this.airports = res.body ?? [];
@@ -42,7 +47,48 @@ export class FlightDispatcher {
     });
   }
 
-  onCalculateRoute() {
+  ngAfterViewInit(): void {
+    this.initMap();
+  }
+
+  private initMap(): void {
+    this.map = L.map('flight-map').setView([45.0, -75.0], 5);
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+      maxZoom: 19,
+    }).addTo(this.map);
+
+    this.routeLayerGroup = L.layerGroup().addTo(this.map);
+  }
+
+  private updateMapRoute(plan: RoutePlan): void {
+    this.routeLayerGroup?.clearLayers();
+
+    const dep: [number, number] = [plan.departureAirport.latitude!, plan.departureAirport.longitude!];
+    const arr: [number, number] = [plan.arrivalAirport.latitude!, plan.arrivalAirport.longitude!];
+
+    // Add Departure Marker (Cyan)
+    const depMarker = L.circleMarker(dep, { color: '#00e5ff', radius: 8, fillOpacity: 0.8 }).bindPopup(
+      `<b>Departure:</b> ${plan.departureAirport.name} (${plan.departureAirport.icaoCode})`,
+    );
+    this.routeLayerGroup?.addLayer(depMarker);
+
+    // Add Arrival Marker (Red)
+    const arrMarker = L.circleMarker(arr, { color: '#ff1744', radius: 8, fillOpacity: 0.8 }).bindPopup(
+      `<b>Arrival:</b> ${plan.arrivalAirport.name} (${plan.arrivalAirport.icaoCode})`,
+    );
+    this.routeLayerGroup?.addLayer(arrMarker);
+
+    // Draw Flight Path Line
+    const flightPath = L.polyline([dep, arr], { color: '#00e5ff', weight: 3, dashArray: '6, 8' });
+    this.routeLayerGroup?.addLayer(flightPath);
+
+    // Auto-zoom camera to fit both airports
+    this.map?.fitBounds(L.latLngBounds([dep, arr]), { padding: [50, 50] });
+  }
+
+  onCalculateRoute(): void {
     if (!this.selectedDepartureAirportId || !this.selectedArrivalAirportId || !this.selectedAircraftId) {
       this.errorMessage = 'Please select an aircraft, departure and arrival airport.';
       return;
@@ -61,6 +107,7 @@ export class FlightDispatcher {
       .subscribe({
         next: plan => {
           this.routePlan = plan;
+          this.updateMapRoute(plan);
           this.isLoading = false;
         },
         error: err => {
@@ -68,6 +115,5 @@ export class FlightDispatcher {
           this.isLoading = false;
         },
       });
-    return;
   }
 }
