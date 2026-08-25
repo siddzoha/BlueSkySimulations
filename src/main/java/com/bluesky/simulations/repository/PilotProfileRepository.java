@@ -42,5 +42,6 @@ public interface PilotProfileRepository extends PilotProfileRepositoryWithBagRel
     @Query("select pilotProfile from PilotProfile pilotProfile left join fetch pilotProfile.user where pilotProfile.id =:id")
     Optional<PilotProfile> findOneWithToOneRelationships(@Param("id") Long id);
 
+    @EntityGraph(attributePaths = { "achievementses" })
     Optional<PilotProfile> findByUser(User user);
 }

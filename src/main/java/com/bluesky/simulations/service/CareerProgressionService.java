@@ -35,21 +35,7 @@ public class CareerProgressionService {
     }
 
     public FlightLog fileFlight(RoutePlanDTO plan) {
-        String login = SecurityUtils.getCurrentUserLogin().orElseThrow(() -> new IllegalStateException("User not authenticated"));
-
-        User user = userRepository.findOneByLogin(login).orElseThrow(() -> new IllegalStateException("User not found: " + login));
-
-        PilotProfile pilotProfile = pilotProfileRepository.findByUser(user).orElseGet(() -> {
-            PilotProfile newProfile = new PilotProfile();
-            newProfile.setUser(user);
-            newProfile.setTotalXp(0);
-            newProfile.setTotalFlightHours(0.0);
-            newProfile.setTotalIfrFlightHours(0.0);
-            newProfile.setTotalNightFlightHours(0.0);
-            newProfile.setFlightsCompleted(0);
-            newProfile.setRankTier(RankTier.STUDENT);
-            return pilotProfileRepository.save(newProfile);
-        });
+        PilotProfile pilotProfile = getCurrentPilotProfile();
 
         FlightLog log = new FlightLog();
         log.setDepartureTime(Instant.now());
@@ -83,5 +69,23 @@ public class CareerProgressionService {
         }
         pilotProfileRepository.save(pilotProfile);
         return savedLog;
+    }
+
+    public PilotProfile getCurrentPilotProfile() {
+        String login = SecurityUtils.getCurrentUserLogin().orElseThrow(() -> new IllegalStateException("User was not authenticated"));
+
+        User user = userRepository.findOneByLogin(login).orElseThrow(() -> new IllegalStateException("User not found: " + login));
+
+        return pilotProfileRepository.findByUser(user).orElseGet(() -> {
+            PilotProfile newProfile = new PilotProfile();
+            newProfile.setUser(user);
+            newProfile.setTotalXp(0);
+            newProfile.setTotalFlightHours(0.0);
+            newProfile.setTotalIfrFlightHours(0.0);
+            newProfile.setTotalNightFlightHours(0.0);
+            newProfile.setFlightsCompleted(0);
+            newProfile.setRankTier(RankTier.STUDENT);
+            return pilotProfileRepository.save(newProfile);
+        });
     }
 }

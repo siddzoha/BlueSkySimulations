@@ -11,6 +11,7 @@ export interface IPilotProfile {
   totalIfrFlightHours?: number | null;
   flightsCompleted?: number | null;
   user?: Pick<IUser, 'id' | 'login'> | null;
+  achievements?: Pick<IAchievement, 'id' | 'title'>[] | null;
   achievementses?: Pick<IAchievement, 'id' | 'title'>[] | null;
 }
 

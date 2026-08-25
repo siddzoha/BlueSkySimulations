@@ -57,6 +57,10 @@ export class PilotProfileService extends PilotProfilesService {
     return this.http.get<IPilotProfile>(`${this.resourceUrl}/${encodeURIComponent(id)}`);
   }
 
+  getCurrentPilot(): Observable<IPilotProfile> {
+    return this.http.get<IPilotProfile>('/api/navigation/current-pilot');
+  }
+
   query(req?: any): Observable<HttpResponse<IPilotProfile[]>> {
     const options = createRequestOption(req);
     return this.http.get<IPilotProfile[]>(this.resourceUrl, { params: options, observe: 'response' });
@@ -94,5 +98,23 @@ export class PilotProfileService extends PilotProfilesService {
       return [...pilotProfilesToAdd, ...pilotProfileCollection];
     }
     return pilotProfileCollection;
+  }
+
+  getNextRankTarget(xp: number): { nextRank: string; targetXp: number; progressPercent: number } {
+    if (xp >= 15000) {
+      return { nextRank: 'MAX RANK', targetXp: 15000, progressPercent: 100 };
+    } else if (xp >= 8000) {
+      const progress = ((xp - 8000) / (15000 - 8000)) * 100;
+      return { nextRank: 'FLEET CHIEF', targetXp: 15000, progressPercent: Math.round(progress) };
+    } else if (xp >= 3000) {
+      const progress = ((xp - 3000) / (8000 - 3000)) * 100;
+      return { nextRank: 'CAPTAIN', targetXp: 8000, progressPercent: Math.round(progress) };
+    } else if (xp >= 1000) {
+      const progress = ((xp - 1000) / (3000 - 1000)) * 100;
+      return { nextRank: 'SENIOR FIRST OFFICER', targetXp: 3000, progressPercent: Math.round(progress) };
+    } else {
+      const progress = (xp / 1000) * 100;
+      return { nextRank: 'FIRST OFFICER', targetXp: 1000, progressPercent: Math.round(progress) };
+    }
   }
 }

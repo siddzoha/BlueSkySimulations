@@ -110,8 +110,16 @@ public class PilotProfileDTO implements Serializable {
         return achievementses;
     }
 
+    public Set<AchievementDTO> getAchievements() {
+        return achievementses;
+    }
+
     public void setAchievementses(Set<AchievementDTO> achievementses) {
         this.achievementses = achievementses;
+    }
+
+    public void setAchievements(Set<AchievementDTO> achievements) {
+        this.achievementses = achievements;
     }
 
     @Override
