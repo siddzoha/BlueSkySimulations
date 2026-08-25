@@ -18,4 +18,8 @@ export class FlightDispatch {
 
     return this.http.get<RoutePlan>(this.resourceUrl, { params });
   }
+
+  public fileFlight(plan: RoutePlan): Observable<any> {
+    return this.http.post<any>('/api/navigation/file-flight', plan);
+  }
 }

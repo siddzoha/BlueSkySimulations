@@ -57,4 +57,18 @@
       <div id="flight-map" style="height: 450px; width: 100%; border-radius: 4px"></div>
     </div>
   </div>
+
+  <div *ngIf="routePlan" class="mt-4 pb-5">
+    <div *ngIf="fileSuccessMessage" class="alert alert-success d-flex align-items-center shadow-sm">
+      <span class="fs-4 me-2">🏆</span>
+      <div class="fw-bold">{{ fileSuccessMessage }}</div>
+    </div>
+
+    <div class="text-center mt-3">
+      <button type="button" class="btn btn-success btn-lg px-5 py-3 shadow fw-bold" (click)="onFileFlight()" [disabled]="isFilingFlight">
+        <span *ngIf="isFilingFlight" class="spinner-border spinner-border-sm me-2"></span>
+        🛫 File Flight Plan & Fly
+      </button>
+    </div>
+  </div>
 </div>

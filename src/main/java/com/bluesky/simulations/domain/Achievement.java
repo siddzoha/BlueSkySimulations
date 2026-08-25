@@ -142,10 +142,10 @@ public class Achievement implements Serializable {
 
     public void setPilotses(Set<PilotProfile> pilotProfiles) {
         if (this.pilotses != null) {
-            this.pilotses.forEach(i -> i.removeAchievements(this));
+            this.pilotses.forEach(i -> i.removeachievements(this));
         }
         if (pilotProfiles != null) {
-            pilotProfiles.forEach(i -> i.addAchievements(this));
+            pilotProfiles.forEach(i -> i.addachievements(this));
         }
         this.pilotses = pilotProfiles;
     }
@@ -157,13 +157,13 @@ public class Achievement implements Serializable {
 
     public Achievement addPilots(PilotProfile pilotProfile) {
         this.pilotses.add(pilotProfile);
-        pilotProfile.getAchievementses().add(this);
+        pilotProfile.getAchievements().add(this);
         return this;
     }
 
     public Achievement removePilots(PilotProfile pilotProfile) {
         this.pilotses.remove(pilotProfile);
-        pilotProfile.getAchievementses().remove(this);
+        pilotProfile.getAchievements().remove(this);
         return this;
     }
 

@@ -32,18 +32,18 @@ class AchievementTest {
 
         achievement.addPilots(pilotProfileBack);
         assertThat(achievement.getPilotses()).containsOnly(pilotProfileBack);
-        assertThat(pilotProfileBack.getAchievementses()).containsOnly(achievement);
+        assertThat(pilotProfileBack.getAchievements()).containsOnly(achievement);
 
         achievement.removePilots(pilotProfileBack);
         assertThat(achievement.getPilotses()).doesNotContain(pilotProfileBack);
-        assertThat(pilotProfileBack.getAchievementses()).doesNotContain(achievement);
+        assertThat(pilotProfileBack.getAchievements()).doesNotContain(achievement);
 
         achievement.pilotses(new HashSet<>(Set.of(pilotProfileBack)));
         assertThat(achievement.getPilotses()).containsOnly(pilotProfileBack);
-        assertThat(pilotProfileBack.getAchievementses()).containsOnly(achievement);
+        assertThat(pilotProfileBack.getAchievements()).containsOnly(achievement);
 
         achievement.setPilotses(new HashSet<>());
         assertThat(achievement.getPilotses()).doesNotContain(pilotProfileBack);
-        assertThat(pilotProfileBack.getAchievementses()).doesNotContain(achievement);
+        assertThat(pilotProfileBack.getAchievements()).doesNotContain(achievement);
     }
 }

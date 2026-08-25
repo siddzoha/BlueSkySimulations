@@ -1,6 +1,7 @@
 package com.bluesky.simulations.repository;
 
 import com.bluesky.simulations.domain.PilotProfile;
+import com.bluesky.simulations.domain.User;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -40,4 +41,6 @@ public interface PilotProfileRepository extends PilotProfileRepositoryWithBagRel
 
     @Query("select pilotProfile from PilotProfile pilotProfile left join fetch pilotProfile.user where pilotProfile.id =:id")
     Optional<PilotProfile> findOneWithToOneRelationships(@Param("id") Long id);
+
+    Optional<PilotProfile> findByUser(User user);
 }

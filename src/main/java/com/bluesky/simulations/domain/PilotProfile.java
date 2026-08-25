@@ -178,21 +178,34 @@ public class PilotProfile implements Serializable {
         return this;
     }
 
+    public Set<Achievement> getAchievements() {
+        return this.achievementses;
+    }
+
     public Set<Achievement> getAchievementses() {
         return this.achievementses;
     }
 
-    public void setAchievementses(Set<Achievement> achievements) {
+    public void setAchievements(Set<Achievement> achievements) {
         this.achievementses = achievements;
     }
 
-    public PilotProfile achievementses(Set<Achievement> achievements) {
-        this.setAchievementses(achievements);
+    public void setAchievementses(Set<Achievement> achievementses) {
+        this.achievementses = achievementses;
+    }
+
+    public PilotProfile achievements(Set<Achievement> achievements) {
+        this.setAchievements(achievements);
         return this;
     }
 
-    public PilotProfile addAchievements(Achievement achievement) {
+    public PilotProfile addachievements(Achievement achievement) {
         this.achievementses.add(achievement);
+        return this;
+    }
+
+    public PilotProfile removeachievements(Achievement achievement) {
+        this.achievementses.remove(achievement);
         return this;
     }
 

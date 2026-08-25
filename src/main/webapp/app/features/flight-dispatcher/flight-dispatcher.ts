@@ -29,6 +29,8 @@ export class FlightDispatcher implements OnInit, AfterViewInit {
   routePlan: RoutePlan | null = null;
   isLoading = false;
   errorMessage: string | null = null;
+  isFilingFlight = false;
+  fileSuccessMessage: string | null = null;
 
   private map: L.Map | null = null;
   private routeLayerGroup: L.LayerGroup | null = null;
@@ -101,6 +103,7 @@ export class FlightDispatcher implements OnInit, AfterViewInit {
 
     this.isLoading = true;
     this.errorMessage = null;
+    this.fileSuccessMessage = null;
 
     this.flightDispatchService
       .calculateRoute(this.selectedDepartureAirportId, this.selectedArrivalAirportId, this.selectedAircraftId)
@@ -115,5 +118,26 @@ export class FlightDispatcher implements OnInit, AfterViewInit {
           this.isLoading = false;
         },
       });
+  }
+
+  onFileFlight(): void {
+    if (!this.routePlan) {
+      return;
+    }
+
+    this.isFilingFlight = true;
+    this.fileSuccessMessage = null;
+    this.errorMessage = null;
+
+    this.flightDispatchService.fileFlight(this.routePlan).subscribe({
+      next: log => {
+        this.isFilingFlight = false;
+        this.fileSuccessMessage = `🎉 Flight logged! Flight #${log.id} recorded (+${this.routePlan?.xpReward} XP earned).`;
+      },
+      error: err => {
+        this.isFilingFlight = false;
+        this.errorMessage = 'Failed to file flight. Make sure you are logged in.';
+      },
+    });
   }
 }

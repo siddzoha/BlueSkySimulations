@@ -2,31 +2,36 @@ package com.bluesky.simulations.web.rest;
 
 import com.bluesky.simulations.domain.Aircraft;
 import com.bluesky.simulations.domain.Airport;
+import com.bluesky.simulations.domain.FlightLog;
 import com.bluesky.simulations.repository.AircraftRepository;
 import com.bluesky.simulations.repository.AirportRepository;
+import com.bluesky.simulations.service.CareerProgressionService;
 import com.bluesky.simulations.service.NavigationCalculationService;
+import com.bluesky.simulations.service.dto.FlightLogDTO;
 import com.bluesky.simulations.service.dto.RoutePlanDTO;
 import com.bluesky.simulations.service.mapper.AircraftMapper;
 import com.bluesky.simulations.service.mapper.AirportMapper;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import com.bluesky.simulations.service.mapper.FlightLogMapper;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/navigation")
 @RequiredArgsConstructor
 public class NavigationResource {
 
+    private static final Logger LOG = LoggerFactory.getLogger(NavigationResource.class);
+
     private final AirportRepository airportRepository;
     private final AircraftRepository aircraftRepository;
     private final AirportMapper airportMapper;
     private final AircraftMapper aircraftMapper;
     private final NavigationCalculationService navigationCalculationService;
+    private final CareerProgressionService careerProgressionService;
+    private final FlightLogMapper flightLogMapper;
 
     @GetMapping("/calculate-route")
     public ResponseEntity<RoutePlanDTO> calcRoute(
@@ -82,5 +87,15 @@ public class NavigationResource {
         );
 
         return ResponseEntity.ok(plan);
+    }
+
+    @PostMapping("/file-flight")
+    public ResponseEntity<FlightLogDTO> fileFlight(@RequestBody RoutePlanDTO plan) {
+        LOG.debug("REST request to file and log flight: {}", plan);
+
+        FlightLog savedLog = careerProgressionService.fileFlight(plan);
+        FlightLogDTO result = flightLogMapper.toDto(savedLog);
+
+        return ResponseEntity.ok(result);
     }
 }

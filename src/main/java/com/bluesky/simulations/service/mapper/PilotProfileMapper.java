@@ -20,6 +20,7 @@ public interface PilotProfileMapper extends EntityMapper<PilotProfileDTO, PilotP
     PilotProfileDTO toDto(PilotProfile s);
 
     @Mapping(target = "removeAchievements", ignore = true)
+    @Mapping(target = "removeachievements", ignore = true)
     PilotProfile toEntity(PilotProfileDTO pilotProfileDTO);
 
     @Named("userLogin")

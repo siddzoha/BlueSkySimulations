@@ -30,16 +30,16 @@ class PilotProfileTest {
         PilotProfile pilotProfile = getPilotProfileRandomSampleGenerator();
         Achievement achievementBack = getAchievementRandomSampleGenerator();
 
-        pilotProfile.addAchievements(achievementBack);
-        assertThat(pilotProfile.getAchievementses()).containsOnly(achievementBack);
+        pilotProfile.addachievements(achievementBack);
+        assertThat(pilotProfile.getAchievements()).containsOnly(achievementBack);
 
-        pilotProfile.removeAchievements(achievementBack);
-        assertThat(pilotProfile.getAchievementses()).doesNotContain(achievementBack);
+        pilotProfile.removeachievements(achievementBack);
+        assertThat(pilotProfile.getAchievements()).doesNotContain(achievementBack);
 
-        pilotProfile.achievementses(new HashSet<>(Set.of(achievementBack)));
-        assertThat(pilotProfile.getAchievementses()).containsOnly(achievementBack);
+        pilotProfile.achievements(new HashSet<>(Set.of(achievementBack)));
+        assertThat(pilotProfile.getAchievements()).containsOnly(achievementBack);
 
-        pilotProfile.setAchievementses(new HashSet<>());
-        assertThat(pilotProfile.getAchievementses()).doesNotContain(achievementBack);
+        pilotProfile.setAchievements(new HashSet<>());
+        assertThat(pilotProfile.getAchievements()).doesNotContain(achievementBack);
     }
 }

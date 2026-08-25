@@ -68,6 +68,6 @@ public class PilotProfileAsserts {
     public static void assertPilotProfileUpdatableRelationshipsEquals(PilotProfile expected, PilotProfile actual) {
         assertThat(actual)
             .as("Verify PilotProfile relationships")
-            .satisfies(a -> assertThat(a.getAchievementses()).as("check achievementses").isEqualTo(expected.getAchievementses()));
+            .satisfies(a -> assertThat(a.getAchievements()).as("check achievementses").isEqualTo(expected.getAchievements()));
     }
 }
