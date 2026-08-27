@@ -1,218 +1,66 @@
-<div>
-  <h2 id="page-heading" data-cy="FlightLogHeading">
-    <span>Flight Logs</span>
-
-    <div class="d-flex justify-content-end">
-      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading()">
-        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
-        <span>Refresh list</span>
-      </button>
-
-      <button
-        id="jh-create-entity"
-        data-cy="entityCreateButton"
-        class="btn btn-primary jh-create-entity create-flight-log"
-        [routerLink]="['/flight-log/new']"
-      >
-        <fa-icon icon="plus" />
-        <span>Create a new Flight Log</span>
-      </button>
-    </div>
-  </h2>
-
-  <jhi-alert-error />
-
-  <jhi-alert />
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Electronic Flight Board</h2>
+    <button class="btn btn-primary" [routerLink]="['/flight-dispatcher']">New Flight</button>
+  </div>
 
   @if (flightLogs().length === 0) {
-    <div class="alert alert-warning" id="no-result">
-      <span>No Flight Logs found</span>
+    <div class="alert alert-info text-center py-4">
+      <h3 class="alert-heading">No Flights Logged</h3>
+      <p class="mb-0">No previous flights, click New Flight to add a flight.</p>
     </div>
   } @else {
-    <div class="table-responsive table-entities" id="entities">
-      <table class="table table-striped" aria-describedby="page-heading">
-        <thead>
-          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
-            <th scope="col" jhiSortBy="id">
-              <div class="d-flex">
-                <span>ID</span>
-
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="departureTime">
-              <div class="d-flex">
-                <span>Departure Time</span>
-
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="arrivalTime">
-              <div class="d-flex">
-                <span>Arrival Time</span>
-
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="durationHours">
-              <div class="d-flex">
-                <span>Duration Hours</span>
-
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="distanceNm">
-              <div class="d-flex">
-                <span>Distance Nm</span>
-
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="cruiseAltitudeFt">
-              <div class="d-flex">
-                <span>Cruise Altitude Ft</span>
-
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="fuelUsedGallons">
-              <div class="d-flex">
-                <span>Fuel Used Gallons</span>
-
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="xpEarned">
-              <div class="d-flex">
-                <span>Xp Earned</span>
-
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="flightRules">
-              <div class="d-flex">
-                <span>Flight Rules</span>
-
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="remarks">
-              <div class="d-flex">
-                <span>Remarks</span>
-
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="aircraft.modelName">
-              <div class="d-flex">
-                <span>Aircraft</span>
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="departureAirport.name">
-              <div class="d-flex">
-                <span>Departure Airport</span>
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="arrivalAirport.name">
-              <div class="d-flex">
-                <span>Arrival Airport</span>
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="pilot.id">
-              <div class="d-flex">
-                <span>Pilot</span>
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
-            <th scope="col"></th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (flightLog of flightLogs(); track trackId(flightLog)) {
-            <tr data-cy="entityTable">
-              <td>
-                <a [routerLink]="['/flight-log', flightLog.id, 'view']">{{ flightLog.id }}</a>
-              </td>
-              <td>{{ flightLog.departureTime | formatMediumDatetime }}</td>
-              <td>{{ flightLog.arrivalTime | formatMediumDatetime }}</td>
-              <td>{{ flightLog.durationHours }}</td>
-              <td>{{ flightLog.distanceNm }}</td>
-              <td>{{ flightLog.cruiseAltitudeFt }}</td>
-              <td>{{ flightLog.fuelUsedGallons }}</td>
-              <td>{{ flightLog.xpEarned }}</td>
-              <td>{{ { null: '', VFR: 'VFR', IFR: 'IFR' }[flightLog.flightRules ?? 'null'] }}</td>
-              <td>{{ flightLog.remarks }}</td>
-              <td>
-                @if (flightLog.aircraft) {
-                  <div>
-                    <a [routerLink]="['/aircraft', flightLog.aircraft.id, 'view']">{{ flightLog.aircraft.modelName }}</a>
-                  </div>
-                }
-              </td>
-              <td>
-                @if (flightLog.departureAirport) {
-                  <div>
-                    <a [routerLink]="['/airport', flightLog.departureAirport.id, 'view']">{{ flightLog.departureAirport.name }}</a>
-                  </div>
-                }
-              </td>
-              <td>
-                @if (flightLog.arrivalAirport) {
-                  <div>
-                    <a [routerLink]="['/airport', flightLog.arrivalAirport.id, 'view']">{{ flightLog.arrivalAirport.name }}</a>
-                  </div>
-                }
-              </td>
-              <td>
-                @if (flightLog.pilot) {
-                  <div>
-                    <a [routerLink]="['/pilot-profile', flightLog.pilot.id, 'view']">{{ flightLog.pilot.id }}</a>
-                  </div>
-                }
-              </td>
-              <td class="text-end">
-                <div class="btn-group">
-                  <a [routerLink]="['/flight-log', flightLog.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
-                    <fa-icon icon="eye" />
-                    <span class="d-none d-md-inline">View</span>
-                  </a>
-
-                  <a [routerLink]="['/flight-log', flightLog.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
-                    <fa-icon icon="pencil-alt" />
-                    <span class="d-none d-md-inline">Edit</span>
-                  </a>
-
-                  <button type="submit" (click)="delete(flightLog)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
-                    <fa-icon icon="times" />
-                    <span class="d-none d-md-inline">Delete</span>
-                  </button>
-                </div>
-              </td>
+    <div class="card bg-dark text-white shadow">
+      <div class="table-responsive">
+        <table class="table table-dark table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Date & Time</th>
+              <th>Route</th>
+              <th>Aircraft</th>
+              <th>Rules</th>
+              <th>Distance</th>
+              <th>Duration</th>
+              <th>Fuel</th>
+              <th>XP Earned</th>
             </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-  }
-  @if (flightLogs().length > 0) {
-    <div>
-      <div class="d-flex justify-content-center">
-        <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
-      </div>
+          </thead>
+          <tbody>
+            @for (log of flightLogs(); track log.id) {
+              <tr>
+                <td>{{ log.departureTime | formatMediumDate }}</td>
+                <td>
+                  <span class="badge bg-primary">{{ log.departureAirport?.icaoCode }}</span>
+                  <span class="badge bg-danger">{{ log.arrivalAirport?.icaoCode }}</span>
+                </td>
+                <td>{{ log.aircraft?.modelName }}</td>
+                <td>
+                  <span class="badge bg-secondary">{{ log.flightRules }}</span>
+                </td>
 
-      <div class="d-flex justify-content-center">
-        <ngb-pagination
-          [collectionSize]="totalItems()"
-          [page]="page()"
-          [pageSize]="itemsPerPage()"
-          [maxSize]="5"
-          [rotate]="true"
-          [boundaryLinks]="true"
-          (pageChange)="navigateToPage($event)"
-        />
+                <td>{{ log.distanceNm }} NM</td>
+                <td>{{ log.durationHours }} hrs</td>
+                <td>{{ log.fuelUsedGallons }} Gal</td>
+
+                <td>
+                  <span class="badge bg-success">+{{ log.xpEarned }} XP</span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+
+        <div class="d-flex justify-content-center mt-3">
+          <ngb-pagination
+            [collectionSize]="totalItems()"
+            [page]="page()"
+            [pageSize]="itemsPerPage()"
+            [maxSize]="5"
+            [rotate]="true"
+            [boundaryLinks]="true"
+            (pageChange)="navigateToPage($event)"
+          />
+        </div>
       </div>
     </div>
   }

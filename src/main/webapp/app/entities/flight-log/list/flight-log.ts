@@ -18,6 +18,7 @@ import { SortByDirective, SortDirective, SortService, type SortState, sortStateS
 import { FlightLogDeleteDialog } from '../delete/flight-log-delete-dialog';
 import { IFlightLog } from '../flight-log.model';
 import { FlightLogService } from '../service/flight-log.service';
+import FormatMediumDatePipe from '../../../shared/date/format-medium-date.pipe';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -34,6 +35,7 @@ import { FlightLogService } from '../service/flight-log.service';
     FormatMediumDatetimePipe,
     NgbPagination,
     ItemCount,
+    FormatMediumDatePipe,
   ],
 })
 export class FlightLog implements OnInit {
