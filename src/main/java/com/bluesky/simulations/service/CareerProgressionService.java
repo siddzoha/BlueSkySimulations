@@ -8,6 +8,7 @@ import com.bluesky.simulations.domain.enumeration.RankTier;
 import com.bluesky.simulations.repository.*;
 import com.bluesky.simulations.security.SecurityUtils;
 import com.bluesky.simulations.service.dto.RoutePlanDTO;
+import com.bluesky.simulations.service.impl.PilotProfileServiceImpl;
 import java.time.Instant;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ public class CareerProgressionService {
     private final UserRepository userRepository;
     private final AirportRepository airportRepository;
     private final AircraftRepository aircraftRepository;
+    private final PilotProfileServiceImpl pilotProfileServiceImpl;
 
     public RankTier calculateRank(int totalXp) {
         if (totalXp >= 15000) return RankTier.FLEET_CHIEF;
@@ -51,7 +53,16 @@ public class CareerProgressionService {
         log.setFlightRules(FlightRules.IFR);
 
         // Link database entities
-        pilotProfile.setTotalFlightHours(pilotProfile.getTotalFlightHours() + plan.estFlightTimeHours());
+        double currTotalFlightHours = pilotProfile.getTotalFlightHours() != null ? pilotProfile.getTotalFlightHours() : 0.0;
+        double updatedTotalHours = Math.round((currTotalFlightHours + plan.estFlightTimeHours()) * 100.0) / 100.0;
+        pilotProfile.setTotalFlightHours(updatedTotalHours);
+
+        if (log.getFlightRules() == FlightRules.IFR) {
+            double currIfrFlightHours = pilotProfile.getTotalIfrFlightHours() != null ? pilotProfile.getTotalIfrFlightHours() : 0.0;
+            double updatedIfrHours = Math.round((currIfrFlightHours + plan.estFlightTimeHours()) * 100.0) / 100.0;
+            pilotProfile.setTotalIfrFlightHours(updatedIfrHours);
+        }
+
         pilotProfile.setTotalXp(pilotProfile.getTotalXp() + plan.xpReward());
         pilotProfile.setFlightsCompleted(pilotProfile.getFlightsCompleted() + 1);
         pilotProfile.setRankTier(calculateRank(pilotProfile.getTotalXp()));
