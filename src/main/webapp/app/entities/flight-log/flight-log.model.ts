@@ -17,8 +17,8 @@ export interface IFlightLog {
   flightRules?: keyof typeof FlightRules | null;
   remarks?: string | null;
   aircraft?: Pick<IAircraft, 'id' | 'modelName'> | null;
-  departureAirport?: Pick<IAirport, 'id' | 'name'> | null;
-  arrivalAirport?: Pick<IAirport, 'id' | 'name'> | null;
+  departureAirport?: Pick<IAirport, 'id' | 'name' | 'icaoCode'> | null;
+  arrivalAirport?: Pick<IAirport, 'id' | 'name' | 'icaoCode'> | null;
   pilot?: Pick<IPilotProfile, 'id'> | null;
 }
 

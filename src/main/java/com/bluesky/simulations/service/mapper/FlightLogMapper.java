@@ -31,6 +31,7 @@ public interface FlightLogMapper extends EntityMapper<FlightLogDTO, FlightLog> {
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
     @Mapping(target = "name", source = "name")
+    @Mapping(target = "icaoCode", source = "icaoCode")
     AirportDTO toDtoAirportName(Airport airport);
 
     @Named("pilotProfileId")

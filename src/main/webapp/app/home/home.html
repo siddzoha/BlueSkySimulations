@@ -1,58 +1,66 @@
-<div class="row">
-  <div class="col-md-3">
-    <span class="hipster img-fluid rounded"></span>
-  </div>
+<div class="container mt-4">
+  @if (!account()) {
+    <h2>Welcome, Guest</h2>
 
-  <div class="col-md-9">
-    <h1 class="display-4"><span>Welcome, Java Hipster!</span> (Blue Sky)</h1>
+    <button class="btn btn-primary me-2" (click)="login()">Sign In</button>
+    <button class="btn btn-outline-info" [routerLink]="['/account/register']">Register</button>
 
-    <p class="lead">This is your homepage</p>
+  } @else {
+    <h2>Welcome back, {{ account()?.login }}</h2>
 
-    <div>
-      @if (account() !== null) {
-        <div class="alert alert-success">
-          @if (account(); as accountRef) {
-            <span id="home-logged-message">You are logged in as user &quot;{{ accountRef.login }}&quot;.</span>
+    <div class="card bg-dark text-white p-4 mb-4 border-primary shadow">
+      <h2>Flight Operations Command Centre</h2>
+      <p class="lead">Welcome back, {{ account()?.login }}! Ready for your next flight?</p>
+      <div class="d-flex gap-2">
+        <button class="btn btn-primary" [routerLink]="['/flight-dispatcher']">New Flight</button>
+        <button class="btn btn-primary" [routerLink]="['/flight-log']">View Flight Log</button>
+      </div>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="card bg-dark text-white p-4 h-100 border-secondary">
+          <h4>Pilot Dossier</h4>
+          <p>
+            Total Flight Hours: <strong>{{ currentPilot?.totalFlightHours }} hrs</strong>
+          </p>
+          <p>
+            Rank: <strong>{{ currentPilot?.rankTier }}</strong>
+          </p>
+          <p>Career XP: {{ currentPilot?.totalXp }} / {{ rankProgression?.targetXp }} XP</p>
+
+          <div class="progress my-2" style="height: 10px; background-color: #212529">
+            <div class="progress-bar bg-info progress-bar-striped" [style.width.%]="rankProgression?.progressPercent"></div>
+          </div>
+
+          <a [routerLink]="['/pilot-profile']" class="btn btn-sm btn-outline-info mt-3">View Profile & Trophy Room</a>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card bg-dark text-white p-4 h-100 border-secondary">
+          <h4>Recent Flights</h4>
+
+          @if (recentFlights.length === 0) {
+            <p class="alert-info">No flights logged yet</p>
+          } @else {
+            <ul class="list-group list-group-flush mt-2">
+              @for (flights of recentFlights; track flights.id) {
+                <li class="list-group-item bg-dark text-white d-flex justify-content-between align-items-center px-0 border-secondary">
+                  <div>
+                    <span class="badge bg-primary">{{ flights.departureAirport?.icaoCode }}</span>
+                    <span class="badge bg-danger">{{ flights.arrivalAirport?.icaoCode }}</span>
+                    <small class="text-secondary ms-2">({{ flights.aircraft?.modelName }})</small>
+                  </div>
+
+                  <span class="badge bg-success">+ {{ flights.xpEarned }} XP</span>
+                </li>
+              }
+            </ul>
+
+            <a [routerLink]="['/flight-log']" class="btn btn-sm btn-outline-primary mt-3"> View Logbook ➔ </a>
           }
         </div>
-      } @else {
-        <div class="alert alert-warning">
-          <span>If you want to </span>
-          <a class="alert-link" (click)="login()">sign in</a
-          ><span
-            >, you can try the default accounts:<br />- Administrator (login=&quot;admin&quot; and password=&quot;admin&quot;) <br />- User
-            (login=&quot;user&quot; and password=&quot;user&quot;).</span
-          >
-        </div>
-
-        <div class="alert alert-warning">
-          <span>You don&apos;t have an account yet?</span>&nbsp;
-          <a class="alert-link" routerLink="/account/register">Register a new account</a>
-        </div>
-      }
+      </div>
     </div>
-
-    <p>If you have any questions on JHipster:</p>
-
-    <ul>
-      <li><a href="https://www.jhipster.tech/" target="_blank" rel="noopener noreferrer">JHipster homepage</a></li>
-      <li>
-        <a href="https://stackoverflow.com/tags/jhipster/info" target="_blank" rel="noopener noreferrer">JHipster on Stack Overflow</a>
-      </li>
-      <li>
-        <a href="https://github.com/jhipster/generator-jhipster/issues?state=open" target="_blank" rel="noopener noreferrer"
-          >JHipster bug tracker</a
-        >
-      </li>
-      <li>
-        <a href="https://gitter.im/jhipster/generator-jhipster" target="_blank" rel="noopener noreferrer">JHipster public chat room</a>
-      </li>
-      <li><a href="https://twitter.com/jhipster" target="_blank" rel="noopener noreferrer">follow &#64;jhipster on Twitter</a></li>
-    </ul>
-
-    <p>
-      <span>If you like JHipster, don&apos;t forget to give us a star on</span>
-      <a href="https://github.com/jhipster/generator-jhipster" target="_blank" rel="noopener noreferrer">GitHub</a>!
-    </p>
-  </div>
+  }
 </div>
