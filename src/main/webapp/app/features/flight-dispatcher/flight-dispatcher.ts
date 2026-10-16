@@ -1,5 +1,5 @@
-import { Component, inject, OnInit, AfterViewInit } from '@angular/core';
-import { NgForOf, NgIf } from '@angular/common';
+import { Component, inject, OnInit, AfterViewInit, NgZone, OnDestroy } from '@angular/core';
+import { NgForOf, NgIf, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import * as L from 'leaflet';
 
@@ -8,24 +8,32 @@ import { AirportService } from '../../entities/airport/service/airport.service';
 import { FlightDispatch } from '../../core/services/flight-dispatch';
 import { IAirport } from '../../entities/airport/airport.model';
 import { IAircraft } from '../../entities/aircraft/aircraft.model';
-import { RoutePlan } from '../../core/models/route-plan';
+import { AircraftWeightLimits, RoutePlan, RouteProfilePoint } from '../../core/models/route-plan';
 
 @Component({
   selector: 'jhi-flight-dispatcher',
-  imports: [NgIf, FormsModule, NgForOf],
+  standalone: true,
+  imports: [NgIf, NgForOf, FormsModule, DecimalPipe],
   templateUrl: './flight-dispatcher.html',
   styleUrl: './flight-dispatcher.scss',
 })
-export class FlightDispatcher implements OnInit, AfterViewInit {
+export class FlightDispatcher implements OnInit, AfterViewInit, OnDestroy {
   private aircraftService = inject(AircraftService);
   private airportService = inject(AirportService);
   private flightDispatchService = inject(FlightDispatch);
+  private ngZone = inject(NgZone);
 
   airports: IAirport[] = [];
   aircraftList: IAircraft[] = [];
+
   selectedAircraftId: number | null = null;
   selectedDepartureAirportId: number | null = null;
   selectedArrivalAirportId: number | null = null;
+
+  takeoffWeightLbs: number | null = null;
+  costIndex = 30;
+  weightLimits: AircraftWeightLimits | null = null;
+
   routePlan: RoutePlan | null = null;
   isLoading = false;
   errorMessage: string | null = null;
@@ -33,18 +41,29 @@ export class FlightDispatcher implements OnInit, AfterViewInit {
   fileSuccessMessage: string | null = null;
 
   private map: L.Map | null = null;
+  private airportMarkersLayer: L.LayerGroup | null = null;
   private routeLayerGroup: L.LayerGroup | null = null;
+  private airportMarkerMap = new Map<number, L.Marker>();
 
   ngOnInit(): void {
-    this.airportService.query({ size: 100 }).subscribe({
+    this.airportService.query({ size: 200 }).subscribe({
       next: res => {
         this.airports = res.body ?? [];
+        if (this.map) {
+          this.renderAllAirportMarkers();
+        }
+      },
+      error: () => {
+        this.errorMessage = 'Failed to load airports from backend.';
       },
     });
 
     this.aircraftService.query({ size: 100 }).subscribe({
       next: res => {
         this.aircraftList = res.body ?? [];
+      },
+      error: () => {
+        this.errorMessage = 'Failed to load aircraft list.';
       },
     });
   }
@@ -53,46 +72,224 @@ export class FlightDispatcher implements OnInit, AfterViewInit {
     this.initMap();
   }
 
+  ngOnDestroy(): void {
+    if (this.map) {
+      this.map.remove();
+      this.map = null;
+    }
+  }
+
   private initMap(): void {
-    this.map = L.map('flight-map').setView([45.0, -75.0], 5);
+    if (this.map) return;
+
+    this.map = L.map('flight-map', {
+      zoomControl: true,
+      minZoom: 2,
+    }).setView([45.0, -75.0], 5);
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
       maxZoom: 19,
     }).addTo(this.map);
 
+    this.airportMarkersLayer = L.layerGroup().addTo(this.map);
     this.routeLayerGroup = L.layerGroup().addTo(this.map);
+
+    if (this.airports.length > 0) {
+      this.renderAllAirportMarkers();
+    }
   }
 
-  private updateMapRoute(plan: RoutePlan): void {
-    this.routeLayerGroup?.clearLayers();
+  private createAirportIcon(airport: IAirport, isDep = false, isArr = false): L.DivIcon {
+    let pinClass = 'aviation-pin';
+    let fillColor = '#90caf9';
 
-    const dep: [number, number] = [plan.departureAirport.latitude!, plan.departureAirport.longitude!];
-    const arr: [number, number] = [plan.arrivalAirport.latitude!, plan.arrivalAirport.longitude!];
+    if (isDep) {
+      pinClass += ' aviation-pin-dep';
+      fillColor = '#00e5ff';
+    } else if (isArr) {
+      pinClass += ' aviation-pin-arr';
+      fillColor = '#ff1744';
+    }
 
-    // Add Departure Marker (Cyan)
-    const depMarker = L.circleMarker(dep, { color: '#00e5ff', radius: 8, fillOpacity: 0.8 }).bindPopup(
-      `<b>Departure:</b> ${plan.departureAirport.name} (${plan.departureAirport.icaoCode})`,
-    );
-    this.routeLayerGroup?.addLayer(depMarker);
+    const html = `
+      <div class="${pinClass}">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="${fillColor}">
+          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+        </svg>
+        <span class="pin-icao-badge">${airport.icaoCode ?? 'APT'}</span>
+      </div>
+    `;
 
-    // Add Arrival Marker (Red)
-    const arrMarker = L.circleMarker(arr, { color: '#ff1744', radius: 8, fillOpacity: 0.8 }).bindPopup(
-      `<b>Arrival:</b> ${plan.arrivalAirport.name} (${plan.arrivalAirport.icaoCode})`,
-    );
-    this.routeLayerGroup?.addLayer(arrMarker);
+    return L.divIcon({
+      className: 'custom-aviation-icon-wrapper',
+      html,
+      iconSize: [28, 36],
+      iconAnchor: [14, 34],
+      popupAnchor: [0, -32],
+    });
+  }
 
-    // Draw Flight Path Line
-    const flightPath = L.polyline([dep, arr], { color: '#00e5ff', weight: 3, dashArray: '6, 8' });
-    this.routeLayerGroup?.addLayer(flightPath);
+  private renderAllAirportMarkers(): void {
+    if (!this.map || !this.airportMarkersLayer) return;
 
-    // Auto-zoom camera to fit both airports
-    this.map?.fitBounds(L.latLngBounds([dep, arr]), { padding: [50, 50] });
+    this.airportMarkersLayer.clearLayers();
+    this.airportMarkerMap.clear();
+
+    const boundsLatLngs: [number, number][] = [];
+
+    this.airports.forEach(airport => {
+      if (airport.latitude == null || airport.longitude == null) return;
+
+      const isDep = airport.id === this.selectedDepartureAirportId;
+      const isArr = airport.id === this.selectedArrivalAirportId;
+      const icon = this.createAirportIcon(airport, isDep, isArr);
+
+      const marker = L.marker([airport.latitude, airport.longitude], {
+        icon,
+        title: `${airport.name} (${airport.icaoCode})`,
+      });
+
+      const popupContent = `
+        <div class="airport-popup">
+          <h6 class="mb-1">${airport.name} (${airport.icaoCode})</h6>
+          <div class="airport-meta">
+            ${airport.city}, ${airport.country}<br/>
+            Elevation: ${airport.elevationFt ?? 0} ft • Runway: ${airport.longestRunwayFt ?? 'N/A'} ft
+          </div>
+          <div class="popup-actions">
+            <button class="btn btn-sm btn-info text-dark fw-bold" id="btn-dep-${airport.id}">Set as DEP</button>
+            <button class="btn btn-sm btn-danger fw-bold" id="btn-arr-${airport.id}">Set as ARR</button>
+          </div>
+        </div>
+      `;
+
+      marker.bindPopup(popupContent);
+
+      marker.on('popupopen', () => {
+        const depBtn = document.getElementById(`btn-dep-${airport.id}`);
+        const arrBtn = document.getElementById(`btn-arr-${airport.id}`);
+
+        if (depBtn) {
+          depBtn.onclick = () => {
+            this.ngZone.run(() => {
+              this.selectAirportFromMap(airport.id, 'DEP');
+              marker.closePopup();
+            });
+          };
+        }
+
+        if (arrBtn) {
+          arrBtn.onclick = () => {
+            this.ngZone.run(() => {
+              this.selectAirportFromMap(airport.id, 'ARR');
+              marker.closePopup();
+            });
+          };
+        }
+      });
+
+      this.airportMarkersLayer?.addLayer(marker);
+      this.airportMarkerMap.set(airport.id, marker);
+      boundsLatLngs.push([airport.latitude, airport.longitude]);
+    });
+
+    if (boundsLatLngs.length > 0 && !this.routePlan) {
+      this.map.fitBounds(L.latLngBounds(boundsLatLngs), { padding: [40, 40], maxZoom: 6 });
+    }
+  }
+
+  private refreshMarkerIcons(): void {
+    this.airportMarkerMap.forEach((marker, airportId) => {
+      const airport = this.airports.find(a => a.id === airportId);
+      if (!airport) return;
+
+      const isDep = airportId === this.selectedDepartureAirportId;
+      const isArr = airportId === this.selectedArrivalAirportId;
+      marker.setIcon(this.createAirportIcon(airport, isDep, isArr));
+
+      if (isDep || isArr) {
+        marker.setZIndexOffset(1000);
+      } else {
+        marker.setZIndexOffset(0);
+      }
+    });
+  }
+
+  selectAirportFromMap(airportId: number, type: 'DEP' | 'ARR'): void {
+    if (type === 'DEP') {
+      if (this.selectedArrivalAirportId === airportId) {
+        // Auto-swap if already arrival
+        this.selectedArrivalAirportId = this.selectedDepartureAirportId;
+      }
+      this.selectedDepartureAirportId = airportId;
+    } else {
+      if (this.selectedDepartureAirportId === airportId) {
+        // Auto-swap if already departure
+        this.selectedDepartureAirportId = this.selectedArrivalAirportId;
+      }
+      this.selectedArrivalAirportId = airportId;
+    }
+
+    this.refreshMarkerIcons();
+    this.checkAutoCalculate();
+  }
+
+  onDepartureChange(): void {
+    if (this.selectedDepartureAirportId && this.selectedDepartureAirportId === this.selectedArrivalAirportId) {
+      this.selectedArrivalAirportId = null;
+    }
+    const airport = this.airports.find(a => a.id === this.selectedDepartureAirportId);
+    if (airport?.latitude && airport?.longitude && this.map) {
+      this.map.panTo([airport.latitude, airport.longitude], { animate: true });
+    }
+    this.refreshMarkerIcons();
+    this.checkAutoCalculate();
+  }
+
+  onArrivalChange(): void {
+    if (this.selectedArrivalAirportId && this.selectedArrivalAirportId === this.selectedDepartureAirportId) {
+      this.selectedDepartureAirportId = null;
+    }
+    const airport = this.airports.find(a => a.id === this.selectedArrivalAirportId);
+    if (airport?.latitude && airport?.longitude && this.map) {
+      this.map.panTo([airport.latitude, airport.longitude], { animate: true });
+    }
+    this.refreshMarkerIcons();
+    this.checkAutoCalculate();
+  }
+
+  onAircraftChange(): void {
+    if (!this.selectedAircraftId) return;
+
+    this.flightDispatchService.getAircraftWeightLimits(this.selectedAircraftId).subscribe({
+      next: limits => {
+        this.weightLimits = limits;
+        this.takeoffWeightLbs = limits.recommendedTakeoffWeightLbs;
+        this.checkAutoCalculate();
+      },
+      error: () => {
+        this.weightLimits = null;
+      },
+    });
+  }
+
+  onParameterChange(): void {
+    this.checkAutoCalculate();
+  }
+
+  private checkAutoCalculate(): void {
+    if (this.selectedDepartureAirportId && this.selectedArrivalAirportId && this.selectedAircraftId) {
+      if (this.selectedDepartureAirportId !== this.selectedArrivalAirportId) {
+        this.onCalculateRoute();
+      }
+    }
   }
 
   onCalculateRoute(): void {
-    if (!this.selectedDepartureAirportId || !this.selectedArrivalAirportId || !this.selectedAircraftId) {
-      this.errorMessage = 'Please select an aircraft, departure and arrival airport.';
+    if (!this.selectedDepartureAirportId || !this.selectedArrivalAirportId) {
+      this.errorMessage = 'Please select both departure and arrival airports.';
       return;
     }
 
@@ -101,29 +298,180 @@ export class FlightDispatcher implements OnInit, AfterViewInit {
       return;
     }
 
+    if (!this.selectedAircraftId) {
+      this.errorMessage = 'Please select an aircraft from the dropdown above.';
+      return;
+    }
+
     this.isLoading = true;
     this.errorMessage = null;
     this.fileSuccessMessage = null;
 
     this.flightDispatchService
-      .calculateRoute(this.selectedDepartureAirportId, this.selectedArrivalAirportId, this.selectedAircraftId)
+      .calculateRoute(
+        this.selectedDepartureAirportId,
+        this.selectedArrivalAirportId,
+        this.selectedAircraftId,
+        this.takeoffWeightLbs ?? undefined,
+        this.costIndex,
+      )
       .subscribe({
         next: plan => {
           this.routePlan = plan;
-          this.updateMapRoute(plan);
+          this.updateMapRouteWithGradient(plan);
           this.isLoading = false;
         },
-        error: err => {
-          this.errorMessage = 'Calculation Error. Please verify backend server is running.';
+        error: () => {
+          this.errorMessage = 'Calculation error. Please ensure backend server is running.';
           this.isLoading = false;
         },
       });
   }
 
-  onFileFlight(): void {
-    if (!this.routePlan) {
-      return;
+  private updateMapRouteWithGradient(plan: RoutePlan): void {
+    if (!this.map || !this.routeLayerGroup) return;
+
+    this.routeLayerGroup.clearLayers();
+
+    const waypoints = plan.profileWaypoints ?? [];
+    const cruiseAlt = plan.targetCruiseAltitudeFt || 30000;
+
+    const depCoord: [number, number] = [plan.departureAirport.latitude!, plan.departureAirport.longitude!];
+    const arrCoord: [number, number] = [plan.arrivalAirport.latitude!, plan.arrivalAirport.longitude!];
+
+    // Pulsing departure circle halo (Cyan)
+    const depHalo = L.circleMarker(depCoord, {
+      radius: 12,
+      color: '#00e5ff',
+      weight: 2,
+      fillColor: '#00e5ff',
+      fillOpacity: 0.35,
+    }).bindPopup(
+      `<b>DEP:</b> ${plan.departureAirport.name} (${plan.departureAirport.icaoCode})<br/>Elev: ${plan.departureAirport.elevationFt} ft`,
+    );
+    this.routeLayerGroup.addLayer(depHalo);
+
+    // Pulsing arrival circle halo (Red)
+    const arrHalo = L.circleMarker(arrCoord, {
+      radius: 12,
+      color: '#ff1744',
+      weight: 2,
+      fillColor: '#ff1744',
+      fillOpacity: 0.35,
+    }).bindPopup(
+      `<b>ARR:</b> ${plan.arrivalAirport.name} (${plan.arrivalAirport.icaoCode})<br/>Elev: ${plan.arrivalAirport.elevationFt} ft`,
+    );
+    this.routeLayerGroup.addLayer(arrHalo);
+
+    // Smooth Altitude Gradient Polyline
+    if (waypoints.length > 1) {
+      for (let i = 0; i < waypoints.length - 1; i++) {
+        const p1 = waypoints[i];
+        const p2 = waypoints[i + 1];
+
+        const avgAlt = (p1.altitudeFt + p2.altitudeFt) / 2;
+        const color = this.getAltitudeColor(avgAlt, cruiseAlt);
+
+        const segment = L.polyline(
+          [
+            [p1.latitude, p1.longitude],
+            [p2.latitude, p2.longitude],
+          ],
+          {
+            color,
+            weight: 5,
+            opacity: 0.95,
+          },
+        );
+
+        segment.bindTooltip(
+          `
+          <div class="altitude-segment-tooltip">
+            <strong>${p1.flightPhase}</strong><br/>
+            Altitude: ${p1.altitudeFt.toLocaleString()} ft (FL${Math.round(p1.altitudeFt / 100)})<br/>
+            Distance: ${p1.distanceFromOriginNm} NM<br/>
+            V/S: ${p1.verticalSpeedFpm >= 0 ? '+' : ''}${p1.verticalSpeedFpm} fpm
+          </div>
+          `,
+          { sticky: true },
+        );
+
+        this.routeLayerGroup.addLayer(segment);
+      }
+    } else {
+      // Fallback straight line if waypoints not present
+      const fallbackLine = L.polyline([depCoord, arrCoord], {
+        color: '#00e5ff',
+        weight: 4,
+        dashArray: '6, 8',
+      });
+      this.routeLayerGroup.addLayer(fallbackLine);
     }
+
+    // Midpoint Badge
+    const midIndex = Math.floor(waypoints.length / 2);
+    const midPoint: [number, number] =
+      waypoints.length > 0
+        ? [waypoints[midIndex].latitude, waypoints[midIndex].longitude]
+        : [(depCoord[0] + arrCoord[0]) / 2, (depCoord[1] + arrCoord[1]) / 2];
+
+    const midHtml = `
+      <div style="background: rgba(18, 24, 38, 0.9); border: 1px solid #00e5ff; border-radius: 4px; padding: 2px 6px; color: #00e5ff; font-size: 11px; font-weight: bold; white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,0.7);">
+        ${plan.distanceNm.toFixed(0)} NM • ${plan.initHeading}° • FL${Math.round(cruiseAlt / 100)}
+      </div>
+    `;
+
+    const midMarker = L.marker(midPoint, {
+      icon: L.divIcon({
+        className: 'route-midpoint-badge',
+        html: midHtml,
+        iconSize: [110, 22],
+        iconAnchor: [55, 11],
+      }),
+    });
+    this.routeLayerGroup.addLayer(midMarker);
+
+    // Zoom camera to fit route
+    this.map.fitBounds(L.latLngBounds([depCoord, arrCoord]), { padding: [60, 60] });
+  }
+
+  private getAltitudeColor(alt: number, maxAlt: number): string {
+    if (maxAlt <= 0) return '#00e5ff';
+    const t = Math.max(0, Math.min(1, alt / maxAlt));
+
+    if (t < 0.25) {
+      return this.interpolateColor('#1565c0', '#00e5ff', t / 0.25);
+    } else if (t < 0.5) {
+      return this.interpolateColor('#00e5ff', '#00e676', (t - 0.25) / 0.25);
+    } else if (t < 0.75) {
+      return this.interpolateColor('#00e676', '#ffea00', (t - 0.5) / 0.25);
+    } else {
+      return this.interpolateColor('#ffea00', '#ff1744', (t - 0.75) / 0.25);
+    }
+  }
+
+  private interpolateColor(hex1: string, hex2: string, factor: number): string {
+    const f = Math.max(0, Math.min(1, factor));
+    const c1 = parseInt(hex1.slice(1), 16);
+    const c2 = parseInt(hex2.slice(1), 16);
+
+    const r1 = (c1 >> 16) & 255;
+    const g1 = (c1 >> 8) & 255;
+    const b1 = c1 & 255;
+
+    const r2 = (c2 >> 16) & 255;
+    const g2 = (c2 >> 8) & 255;
+    const b2 = c2 & 255;
+
+    const r = Math.round(r1 + (r2 - r1) * f);
+    const g = Math.round(g1 + (g2 - g1) * f);
+    const b = Math.round(b1 + (b2 - b1) * f);
+
+    return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+  }
+
+  onFileFlight(): void {
+    if (!this.routePlan) return;
 
     this.isFilingFlight = true;
     this.fileSuccessMessage = null;
@@ -134,7 +482,7 @@ export class FlightDispatcher implements OnInit, AfterViewInit {
         this.isFilingFlight = false;
         this.fileSuccessMessage = `🎉 Flight logged! Flight #${log.id} recorded (+${this.routePlan?.xpReward} XP earned).`;
       },
-      error: err => {
+      error: () => {
         this.isFilingFlight = false;
         this.errorMessage = 'Failed to file flight. Make sure you are logged in.';
       },

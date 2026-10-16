@@ -1,74 +1,214 @@
-<div class="container mt-4">
-  <h2>Flight Dispatch | Route Planner</h2>
-
-  <!-- Aircraft -->
-  <select class="form-select" [(ngModel)]="selectedAircraftId">
-    <option [ngValue]="null" disabled selected>-- Select Aircraft --</option>
-    <option *ngFor="let plane of aircraftList" [ngValue]="plane.id">{{ plane.modelName }} ({{ plane.icaoType }})</option>
-  </select>
-
-  <!-- Departure Airport -->
-  <label class="form-label mt-2">Departure Airport</label>
-  <select class="form-select" [(ngModel)]="selectedDepartureAirportId">
-    <option [ngValue]="null" disabled selected>-- Select Departure Airport --</option>
-    <option *ngFor="let airport of airports" [ngValue]="airport.id">{{ airport.name }} ({{ airport.icaoCode }})</option>
-  </select>
-
-  <!-- Arrival Airport -->
-  <label class="form-label mt-2">Arrival Airport</label>
-  <select class="form-select" [(ngModel)]="selectedArrivalAirportId">
-    <option [ngValue]="null" disabled selected>-- Select Arrival Airport --</option>
-    <option *ngFor="let airport of airports" [ngValue]="airport.id">{{ airport.name }} ({{ airport.icaoCode }})</option>
-  </select>
-
-  <button class="btn btn-primary" (click)="onCalculateRoute()" [disabled]="isLoading">
-    <span *ngIf="isLoading">Calculating...</span>
-    <span *ngIf="!isLoading">Calculate Flight Plan</span>
-  </button>
-
-  <div *ngIf="errorMessage" class="alert alert-danger mt-3">
-    {{ errorMessage }}
+<div class="container flight-dispatcher-container mt-4 mb-5">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h2 class="fw-bold mb-0 text-white">✈️ Flight Dispatch | Route Planner</h2>
+      <p class="text-secondary small mb-0">Select departure and arrival airports directly from the map or dropdowns below.</p>
+    </div>
+    <div *ngIf="routePlan?.targetCruiseAltitudeFt" class="badge bg-primary fs-6 px-3 py-2">
+      Target Cruise: FL{{ (routePlan?.targetCruiseAltitudeFt || 0) / 100 | number: '2.0-0' }} ({{
+        routePlan?.targetCruiseAltitudeFt | number
+      }}
+      ft)
+    </div>
   </div>
 
-  <div *ngIf="routePlan" class="card mt-4 p-3 bg-dark text-white">
-    <h3>Flight Briefing</h3>
-    <p>
-      Distance: <strong>{{ routePlan.distanceNm }} NM</strong>
-    </p>
-    <p>
-      Initial Heading: <strong>{{ routePlan.initHeading }}°</strong>
-    </p>
-    <p>
-      Estimated Time: <strong>{{ routePlan.estFlightTimeHours }} Hours</strong>
-    </p>
-    <p>
-      Fuel Required: <strong>{{ routePlan.estFuelGallons }} Gallons</strong>
-    </p>
-    <p>
-      XP Reward: <span class="badge bg-success">+{{ routePlan.xpReward }} XP</span>
-    </p>
+  <!-- Dispatcher Configuration Grid -->
+  <div class="card bg-dark text-white border-secondary mb-4 shadow">
+    <div class="card-body">
+      <div class="row g-3">
+        <!-- Aircraft Selection -->
+        <div class="col-md-4">
+          <label class="form-label fw-bold text-info">1. Select Aircraft *</label>
+          <select
+            class="form-select bg-black text-white border-secondary"
+            [(ngModel)]="selectedAircraftId"
+            (ngModelChange)="onAircraftChange()"
+          >
+            <option [ngValue]="null" disabled selected>-- Choose Aircraft --</option>
+            <option *ngFor="let plane of aircraftList" [ngValue]="plane.id">
+              {{ plane.modelName }} ({{ plane.icaoType }}) • Ceiling: {{ plane.serviceCeilingFt | number }} ft
+            </option>
+          </select>
+          <div *ngIf="weightLimits" class="form-text text-muted small mt-1">
+            Category Limits: Empty {{ weightLimits.emptyWeightLbs | number }} lbs | MTOW {{ weightLimits.maxTakeoffWeightLbs | number }} lbs
+          </div>
+        </div>
+
+        <!-- Takeoff Weight -->
+        <div class="col-md-4">
+          <label class="form-label fw-bold text-info">2. Takeoff Weight (lbs) *</label>
+          <input
+            type="number"
+            class="form-control bg-black text-white border-secondary"
+            [(ngModel)]="takeoffWeightLbs"
+            [min]="weightLimits?.emptyWeightLbs || 1000"
+            [max]="weightLimits?.maxTakeoffWeightLbs || 900000"
+            (ngModelChange)="onParameterChange()"
+            placeholder="e.g. 145000"
+          />
+          <div *ngIf="weightLimits" class="form-text text-muted small mt-1">
+            Rec: {{ weightLimits.recommendedTakeoffWeightLbs | number }} lbs (82% MTOW)
+          </div>
+        </div>
+
+        <!-- Cost Index (CI) -->
+        <div class="col-md-4">
+          <label class="form-label fw-bold text-info d-flex justify-content-between">
+            <span>3. Cost Index (CI: 0–100) *</span>
+            <span class="badge bg-secondary">{{ costIndex }}</span>
+          </label>
+          <div class="d-flex align-items-center gap-2">
+            <span class="small text-muted">Econ (0)</span>
+            <input type="range" class="form-range" min="0" max="100" [(ngModel)]="costIndex" (ngModelChange)="onParameterChange()" />
+            <span class="small text-muted">Max Spd (100)</span>
+          </div>
+          <div class="form-text text-muted small mt-1">Standard: 30 • Higher CI increases climb and descent vertical speeds.</div>
+        </div>
+
+        <!-- Departure Airport -->
+        <div class="col-md-6 mt-3">
+          <label class="form-label fw-bold text-cyan" style="color: #00e5ff"> 🛫 Departure Airport (DEP) * </label>
+          <select
+            class="form-select bg-black text-white border-info"
+            [(ngModel)]="selectedDepartureAirportId"
+            (ngModelChange)="onDepartureChange()"
+          >
+            <option [ngValue]="null" disabled selected>-- Select Departure Airport (or click map) --</option>
+            <option *ngFor="let airport of airports" [ngValue]="airport.id">
+              {{ airport.icaoCode }} — {{ airport.name }} ({{ airport.city }}, {{ airport.country }}) • Elev: {{ airport.elevationFt }} ft
+            </option>
+          </select>
+        </div>
+
+        <!-- Arrival Airport -->
+        <div class="col-md-6 mt-3">
+          <label class="form-label fw-bold" style="color: #ff1744"> 🛬 Arrival Airport (ARR) * </label>
+          <select
+            class="form-select bg-black text-white border-danger"
+            [(ngModel)]="selectedArrivalAirportId"
+            (ngModelChange)="onArrivalChange()"
+          >
+            <option [ngValue]="null" disabled selected>-- Select Arrival Airport (or click map) --</option>
+            <option *ngFor="let airport of airports" [ngValue]="airport.id">
+              {{ airport.icaoCode }} — {{ airport.name }} ({{ airport.city }}, {{ airport.country }}) • Elev: {{ airport.elevationFt }} ft
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Action Button & Alerts -->
+      <div class="d-flex justify-content-between align-items-center mt-4 pt-2 border-top border-secondary">
+        <div class="small text-muted">
+          💡 <span class="text-light">Tip:</span> You can also directly click any airport pin on the radar map below to set DEP or ARR.
+        </div>
+        <button class="btn btn-primary px-4 fw-bold shadow" (click)="onCalculateRoute()" [disabled]="isLoading">
+          <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+          <span *ngIf="isLoading">Calculating Flight Physics...</span>
+          <span *ngIf="!isLoading">⚡ Calculate Flight Plan</span>
+        </button>
+      </div>
+    </div>
   </div>
 
-  <div class="card mt-4 p-2 bg-dark text-white shadow">
-    <div class="card-header">
-      <h5 class="mb-0">Live Flight Navigation Map</h5>
+  <!-- Error Alert -->
+  <div *ngIf="errorMessage" class="alert alert-danger shadow-sm d-flex align-items-center">
+    <span class="fs-4 me-2">⚠️</span>
+    <div>{{ errorMessage }}</div>
+  </div>
+
+  <!-- Live Flight Navigation Map Card -->
+  <div class="card bg-dark text-white border-secondary shadow mb-4">
+    <div class="card-header bg-black d-flex justify-content-between align-items-center border-secondary py-3">
+      <h5 class="mb-0 fw-bold d-flex align-items-center gap-2"><span style="color: #00e5ff">🌐</span> Interactive Flight Radar Map</h5>
+      <span class="badge bg-secondary small">
+        <span style="color: #00e5ff">● Cyan = DEP</span> &nbsp;|&nbsp; <span style="color: #ff1744">● Red = ARR</span> &nbsp;|&nbsp;
+        <span style="color: #90caf9">● Blue = Inactive</span>
+      </span>
     </div>
     <div class="card-body p-0">
-      <div id="flight-map" style="height: 450px; width: 100%; border-radius: 4px"></div>
+      <div id="flight-map"></div>
+    </div>
+    <!-- Altitude Gradient Legend Bar -->
+    <div class="card-footer bg-black border-secondary py-2">
+      <div class="gradient-legend">
+        <span class="fw-bold" style="color: #1565c0">0 ft (Ground)</span>
+        <div class="legend-bar"></div>
+        <span class="fw-bold" style="color: #ff1744">
+          Peak Cruise ({{ routePlan?.targetCruiseAltitudeFt ? (routePlan?.targetCruiseAltitudeFt | number) + ' ft' : 'Ceiling' }})
+        </span>
+      </div>
     </div>
   </div>
 
-  <div *ngIf="routePlan" class="mt-4 pb-5">
-    <div *ngIf="fileSuccessMessage" class="alert alert-success d-flex align-items-center shadow-sm">
-      <span class="fs-4 me-2">🏆</span>
-      <div class="fw-bold">{{ fileSuccessMessage }}</div>
+  <!-- Flight Briefing Card -->
+  <div *ngIf="routePlan" class="card bg-dark text-white border-info mb-4 shadow">
+    <div class="card-header bg-black border-info d-flex justify-content-between align-items-center">
+      <h4 class="mb-0 text-info fw-bold">📋 Operational Flight Plan Briefing (OFP)</h4>
+      <span class="badge bg-success fs-6">+{{ routePlan.xpReward }} XP Reward</span>
+    </div>
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-6 col-md-3">
+          <div class="text-secondary small">Total Ground Distance</div>
+          <div class="fs-4 fw-bold text-white">{{ routePlan.distanceNm | number: '1.0-1' }} <span class="fs-6 text-muted">NM</span></div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="text-secondary small">Initial Magnetic Track</div>
+          <div class="fs-4 fw-bold text-white">{{ routePlan.initHeading }}° <span class="fs-6 text-muted">MAG</span></div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="text-secondary small">Planned Cruise Altitude</div>
+          <div class="fs-4 fw-bold" style="color: #ff9100">
+            FL{{ (routePlan.targetCruiseAltitudeFt || 0) / 100 | number: '2.0-0' }}
+            <span class="fs-6 text-muted">({{ routePlan.targetCruiseAltitudeFt | number }} ft)</span>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="text-secondary small">Est. Enroute Flight Time</div>
+          <div class="fs-4 fw-bold text-white">
+            {{ routePlan.estFlightTimeHours | number: '1.2-2' }} <span class="fs-6 text-muted">Hours</span>
+          </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+          <div class="text-secondary small">Vertical Climb Profile</div>
+          <div class="fs-5 fw-bold text-success">+{{ routePlan.climbRateFpm | number }} <span class="fs-6 text-muted">fpm</span></div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="text-secondary small">Vertical Descent Profile</div>
+          <div class="fs-5 fw-bold text-warning">{{ routePlan.descentRateFpm | number }} <span class="fs-6 text-muted">fpm</span></div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="text-secondary small">Total Trip Fuel Required</div>
+          <div class="fs-5 fw-bold text-info">
+            {{ routePlan.estFuelGallons | number: '1.1-1' }} <span class="fs-6 text-muted">GAL</span>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="text-secondary small">Planned Takeoff Weight</div>
+          <div class="fs-5 fw-bold text-light">
+            {{ routePlan.takeoffWeightLbs | number }} <span class="fs-6 text-muted">lbs</span> (CI {{ routePlan.costIndex }})
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- File Flight Plan & Log Section -->
+  <div *ngIf="routePlan" class="text-center pt-2 pb-5">
+    <div *ngIf="fileSuccessMessage" class="alert alert-success d-flex align-items-center justify-content-center shadow mb-3">
+      <span class="fs-3 me-2">🎉</span>
+      <div class="fw-bold fs-5">{{ fileSuccessMessage }}</div>
     </div>
 
-    <div class="text-center mt-3">
-      <button type="button" class="btn btn-success btn-lg px-5 py-3 shadow fw-bold" (click)="onFileFlight()" [disabled]="isFilingFlight">
-        <span *ngIf="isFilingFlight" class="spinner-border spinner-border-sm me-2"></span>
-        🛫 File Flight Plan & Fly
-      </button>
-    </div>
+    <button
+      type="button"
+      class="btn btn-success btn-lg px-5 py-3 shadow-lg fw-bold fs-5"
+      (click)="onFileFlight()"
+      [disabled]="isFilingFlight"
+    >
+      <span *ngIf="isFilingFlight" class="spinner-border spinner-border-sm me-2"></span>
+      🛫 File Flight Plan & Authorize Departure
+    </button>
   </div>
 </div>
