@@ -1,6 +1,7 @@
 package com.bluesky.simulations.service.dto;
 
 import java.io.Serializable;
+import java.util.List;
 
 public record RoutePlanDTO(
     AirportDTO departureAirport,
@@ -10,5 +11,11 @@ public record RoutePlanDTO(
     Integer initHeading,
     Double estFlightTimeHours,
     Double estFuelGallons,
-    Integer xpReward
+    Integer xpReward,
+    Integer takeoffWeightLbs,
+    Integer costIndex,
+    Integer targetCruiseAltitudeFt,
+    Integer climbRateFpm,
+    Integer descentRateFpm,
+    List<RouteProfilePointDTO> profileWaypoints
 ) implements Serializable {}
