@@ -23,6 +23,11 @@ vi.mock('leaflet', () => ({
   tileLayer: () => ({
     addTo: vi.fn().mockReturnThis(),
   }),
+  control: {
+    layers: () => ({
+      addTo: vi.fn().mockReturnThis(),
+    }),
+  },
   layerGroup: () => ({
     addTo: vi.fn().mockReturnThis(),
     clearLayers: vi.fn().mockReturnThis(),
