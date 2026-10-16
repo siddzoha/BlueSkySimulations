@@ -7,7 +7,7 @@ export interface RouteProfilePoint {
   altitudeFt: number;
   distanceFromOriginNm: number;
   verticalSpeedFpm: number;
-  flightPhase: 'CLIMB' | 'CRUISE' | 'DESCENT' | string;
+  flightPhase: 'CLIMB' | 'CRUISE' | 'DESCENT';
 }
 
 export interface AircraftWeightLimits {
