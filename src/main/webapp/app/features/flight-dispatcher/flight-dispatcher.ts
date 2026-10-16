@@ -209,11 +209,35 @@ export class FlightDispatcher implements OnInit, AfterViewInit, OnDestroy {
       minZoom: 2,
     }).setView([45.0, -75.0], 5);
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    // 1. ESRI Dark Gray Canvas (Default) - 100% Free, Zero Key, Zero Watermark
+    const darkCanvas = L.tileLayer(
+      'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+      {
+        attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+        maxZoom: 16,
+      },
+    );
+
+    // 2. ESRI World Imagery (Satellite) - 100% Free, Zero Key, Zero Watermark
+    const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP',
       maxZoom: 19,
-    }).addTo(this.map);
+    });
+
+    // 3. OpenStreetMap - 100% Free Open Data
+    const osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 19,
+    });
+
+    darkCanvas.addTo(this.map);
+
+    const baseMaps = {
+      '🌙 Dark Radar': darkCanvas,
+      '🛰️ Satellite View': satellite,
+      '🗺️ OpenStreetMap': osm,
+    };
+    L.control.layers(baseMaps, undefined, { position: 'topright' }).addTo(this.map);
 
     this.airportMarkersLayer = L.layerGroup().addTo(this.map);
     this.routeLayerGroup = L.layerGroup().addTo(this.map);

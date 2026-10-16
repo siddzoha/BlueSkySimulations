@@ -159,3 +159,21 @@
   border-radius: 4px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
 }
+
+/* Dark theme for Leaflet Layer Switcher Control */
+.leaflet-control-layers {
+  background: rgba(18, 24, 38, 0.95) !important;
+  color: #e0e6ed !important;
+  border: 1px solid rgba(0, 229, 255, 0.3) !important;
+  border-radius: 6px !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.7) !important;
+  backdrop-filter: blur(6px);
+  padding: 6px 10px !important;
+
+  label {
+    margin-bottom: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+}
